@@ -22,4 +22,6 @@ public class Account implements Serializable {
     private String password; // 密码
     private Integer type; // 注册类型
     private Integer status; // 账号状态
+    
+    private User user; // 用户信息
 }

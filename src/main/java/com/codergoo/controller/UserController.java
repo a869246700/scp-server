@@ -34,11 +34,10 @@ public class UserController {
     // 修改用户信息
     @PostMapping("/updateUserInfo")
     @AccountLoginToken
-    public Result updateUserInfo(User user) {
-        // id为空则报错
-        if (StringUtils.isBlank(String.valueOf(user.getId()))) {
-            return ResultUtil.error(500, "错误请求, 请携带用户ID");
-        }
+    public Result updateUserInfo(User user, HttpServletRequest httpServletRequest) {
+        // 1. 根据 token 获取用户信息
+        String token = httpServletRequest.getHeader("token"); // 从 http 请求头中取出 token
+        user.setId(tokenService.getUserByToken(token).getId());
         
         // 执行修改
         Boolean updateSuccess = userService.updateUserInfo(user);

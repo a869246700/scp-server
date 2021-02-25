@@ -4,8 +4,11 @@ import com.codergoo.domain.Dynamic;
 import com.codergoo.domain.DynamicResource;
 import com.codergoo.mapper.DynamicMapper;
 import com.codergoo.mapper.DynamicResourceMapper;
+import com.codergoo.service.DynamicResourceService;
 import com.codergoo.service.DynamicService;
+import com.codergoo.vo.DynamicVo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,6 +19,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author coderGoo
@@ -29,13 +33,16 @@ public class DynamicServiceImpl implements DynamicService {
     public String dynamicResourceUpload;
     
     @Autowired
+    public DynamicResourceService dynamicResourceService;
+    
+    @Autowired
     public DynamicMapper dynamicMapper;
     
     @Autowired
     public DynamicResourceMapper dynamicResourceMapper;
     
     @Override
-    public Dynamic addDynamic(Dynamic dynamic, MultipartFile[] resourceList) {
+    public DynamicVo addDynamic(Dynamic dynamic, MultipartFile[] resourceList) {
         List<String> dynamicResourceList = new LinkedList<>(); // 保存的动态资源信息
         
         // 1. 获取id
@@ -58,48 +65,140 @@ public class DynamicServiceImpl implements DynamicService {
             folder.mkdirs();
         }
         
-        // 5. 图片存储
-        Integer index = 0; // 用于记录图片下标
-        for (MultipartFile resource : resourceList) {
-            // 生成动态资源文件的名称
-            String oldFilePath = resource.getOriginalFilename();
-            String suffix = oldFilePath.substring(oldFilePath.lastIndexOf("."));
-            String fileName = "dynamic" + dynamic.getId() + "-resource-" +  index + suffix; // 文件名称
-            String filePath = dynamicResourceUpload + "/" + fileName;
-    
-            try {
-                // 6. 保存动态资源文件
-                resource.transferTo(new File(filePath));
+        // 如果有传输资源的话
+        if (resourceList != null && resourceList.length > 0) {
+            // 5. 图片存储
+            int index = 0; // 用于记录图片下标
+            for (MultipartFile resource : resourceList) {
+                // 生成动态资源文件的名称
+                String oldFileName = resource.getOriginalFilename();
+                // 用于控制空文件数组上传的情况
+                if (null == oldFileName || "".equals(oldFileName)) {
+                    break;
+                }
+                String suffix = oldFileName.substring(oldFileName.lastIndexOf("."));
+                String fileName = "dynamic" + dynamic.getId() + "-resource-" +  index + suffix; // 文件名称
+                String filePath = dynamicResourceUpload + "/" + fileName;
         
-                // 7. 将动态资源路径保存到 DynamicResource 表中
-                DynamicResource dynamicResource = new DynamicResource();
-                dynamicResource.setDid(dynamic.getId());
-                dynamicResource.setSrc(filePath);
-                dynamicResource.setType(1); // 默认为：1（图片）
-                Integer integer = dynamicResourceMapper.addDynamicResource(dynamicResource);
-                if (integer != 1) {
+                try {
+                    // 6. 保存动态资源文件
+                    resource.transferTo(new File(filePath));
+            
+                    // 7. 将动态资源路径保存到 DynamicResource 表中
+                    DynamicResource dynamicResource = new DynamicResource();
+                    dynamicResource.setDid(dynamic.getId());
+                    dynamicResource.setSrc(filePath);
+                    dynamicResource.setType(1); // 默认为：1（图片）
+                    Integer integer = dynamicResourceMapper.addDynamicResource(dynamicResource);
+                    if (integer != 1) {
+                        throw new RuntimeException("图片保存失败，请检查资源问题！");
+                    }
+                    dynamicResourceList.add(filePath);
+                    index++; // 下标+1
+                } catch (IOException e) {
                     throw new RuntimeException("图片保存失败，请检查资源问题！");
                 }
-                dynamicResourceList.add(filePath);
-                index++; // 下标+1
-            } catch (IOException e) {
-                throw new RuntimeException("图片保存失败，请检查资源问题！");
             }
         }
         
-        // 6. 给 dynamic 添加 dynamicResourceList
-        dynamic.setResourceList(dynamicResourceList);
-        return dynamic;
+        // 6. 给 dynamicVo 添加 dynamicResourceList
+        DynamicVo dynamicVo = new DynamicVo();
+        dynamicVo.setResourceList(dynamicResourceList);
+        BeanUtils.copyProperties(dynamic, dynamicVo); // 属性转换
+        // 7. 返回数据
+        return dynamicVo;
     }
     
     @Override
-    public Boolean removeDynamic(Integer id) {
-        return null;
+    public Boolean removeDynamic(Integer id, Integer uid) {
+        // 1. 判断动态是否属于该用户
+        Integer hasDynamic = dynamicMapper.hasDynamic(uid, id);
+        if (hasDynamic != 1) {
+            log.error("hasDynamic: " + hasDynamic);
+            throw new RuntimeException("数据存在异常，请联系开发人员紧急维护！");
+        }
+        
+        // 2. 删除动态资源
+        // 2.1 获取动态资源列表
+        List<DynamicResource> dynamicResourceList = dynamicResourceMapper.listByDid(id);
+        // 2.2 移除动态资源文件
+        for (DynamicResource dynamicResource : dynamicResourceList) {
+            File file = new File(dynamicResource.getSrc());
+            // 判断文件是否存在
+            if (file.exists()) {
+                file.delete(); // 删除文件
+            }
+            // 从数据库只移除当前资源记录
+            dynamicResourceMapper.removeDynamicResource(dynamicResource.getId());
+        }
+        log.info("dynamicResourceList: " + dynamicResourceList);
+        // 3. 移除动态
+        Integer delInteger = dynamicMapper.removeDynamic(id);
+        return delInteger == 1;
+    }
+    
+    @Override
+    public Boolean updateDynamicPermissions(Integer id, Integer uid, Integer permissions) {
+        // 1. 判断动态是否属于该用户
+        Integer hasDynamic = dynamicMapper.hasDynamic(uid, id);
+        if (hasDynamic != 1) {
+            log.error("hasDynamic: " + hasDynamic);
+            throw new RuntimeException("数据存在异常，请联系开发人员紧急维护！");
+        }
+        
+        Integer integer = dynamicMapper.updateDynamicPermissions(id, permissions);
+        return integer == 1;
+    }
+    
+    @Override
+    public List<DynamicVo> selfDynamicList(Integer uid) {
+        // 1. 获取动态列表
+        List<Dynamic> dynamicList = dynamicMapper.listDynamicByUid(uid);
+        
+        // 2. 中间数据转换处理 PO => VO
+        List<DynamicVo> resultDynamicList = new LinkedList<>();
+        dynamicList.forEach(dynamic -> {
+            DynamicVo dynamicVo = new DynamicVo();
+            // 属性转换
+            BeanUtils.copyProperties(dynamic, dynamicVo);
+    
+            // 动态资源转换
+            List<String> dynamicResourceList = dynamic.getResourceList().stream().map(DynamicResource::getSrc).collect(Collectors.toList());
+            dynamicVo.setResourceList(dynamicResourceList);
+            resultDynamicList.add(dynamicVo);
+            // 动态评论
+            dynamicVo.setDiscussesList(dynamic.getDiscussList());
+        });
+        
+        // 3. 返回动态动态列表
+        return resultDynamicList;
     }
     
     @Override
     public Integer getMaxId() {
         Integer id = dynamicMapper.getMaxId();
         return  id == null ? 1 : id + 1;
+    }
+    
+    @Override
+    public DynamicVo getDynamicById(Integer id) {
+        Dynamic dynamic = dynamicMapper.findById(id);
+        if (null == dynamic) {
+            throw new RuntimeException("获取失败，查询不到该动态信息！");
+        }
+        
+        if (1 != dynamic.getPermissions()) {
+            throw new RuntimeException("获取失败，该动态设置了查看权限！");
+        }
+        
+        DynamicVo dynamicVo = new DynamicVo();
+        // 属性转换
+        BeanUtils.copyProperties(dynamic, dynamicVo);
+        // 动态资源转换
+        List<String> dynamicResourceList = dynamic.getResourceList().stream().map(DynamicResource::getSrc).collect(Collectors.toList());
+        dynamicVo.setResourceList(dynamicResourceList);
+        // 动态评论
+        dynamicVo.setDiscussesList(dynamic.getDiscussList());
+        return dynamicVo;
     }
 }

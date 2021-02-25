@@ -139,9 +139,9 @@ public class TokenServiceImpl implements TokenService {
             if (!token.equals(redisToken)) {
                 throw new RuntimeException("token错误，请重新获取！");
             }
-            log.info("userId: " + decodedJWT.getClaim("aid").asInt());
-            log.info("username: " + decodedJWT.getClaim("username").asString());
-            log.info("过期时间: " + decodedJWT.getExpiresAt());
+            // log.info("userId: " + decodedJWT.getClaim("aid").asInt());
+            // log.info("username: " + decodedJWT.getClaim("username").asString());
+            // log.info("过期时间: " + decodedJWT.getExpiresAt());
         } catch (JWTVerificationException e) {
             throw new RuntimeException("401");
         }

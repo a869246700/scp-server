@@ -20,6 +20,9 @@ public class GlobalExceptionHandler {
         if (msg == null || msg.equals("")) {
             msg = "服务器出错";
         }
+        if ("401".equals(msg)) {
+            return ResultUtil.error(401, "token无效，请重新获取！");
+        }
         return ResultUtil.error(500, msg);
     }
 }
