@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 账户模块接口
@@ -54,7 +55,7 @@ public class AccountController {
     private String registerVcTag;
     
     @Value("${vc.expire-time}")
-    private String vcExpireTime;
+    private Integer vcExpireTime;
     
     // 获取注册邮件验证码
     @GetMapping("/getRegisterVc")
@@ -76,7 +77,7 @@ public class AccountController {
     
         if ("ok".equals(sendMail.getStatus())) {
             // 3. 将登录验证码保存到 redis 中
-            redisUtil.set(registerVcTag + to, registerVc, Integer.valueOf(vcExpireTime) * 60);
+            redisUtil.setEx(registerVcTag + to, registerVc, vcExpireTime, TimeUnit.MINUTES);
             return ResultUtil.success(200, "验证码发送成功!");
         }
         return ResultUtil.success(200, "验证码发送失败!");
@@ -104,7 +105,7 @@ public class AccountController {
         
         if ("ok".equals(sendMail.getStatus())) {
             // 3. 将登录验证码保存到 redis 中
-            redisUtil.set(loginVcTag + to, loginVc, Integer.valueOf(vcExpireTime) * 60);
+            redisUtil.setEx(loginVcTag + to, loginVc, vcExpireTime, TimeUnit.MINUTES);
             return ResultUtil.success(200, "验证码发送成功!");
         }
         return ResultUtil.success(200, "验证码发送失败!");
@@ -269,7 +270,7 @@ public class AccountController {
         resultObject.put("token", token);
         
         // 11. 删除redis中的验证码
-        redisUtil.del(loginVcKey);
+        redisUtil.delete(loginVcKey);
         return ResultUtil.success(resultObject);
     }
     
@@ -319,7 +320,7 @@ public class AccountController {
         resultObject.put("token", token);
     
         // 6. 删除redis中的登录验证码
-        redisUtil.del(loginVcKey);
+        redisUtil.delete(loginVcKey);
         return ResultUtil.success(resultObject);
     }
     

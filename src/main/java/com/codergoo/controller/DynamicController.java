@@ -33,6 +33,7 @@ public class DynamicController {
     public TokenService tokenService;
 
     @GetMapping("/test")
+    @AccountLoginToken
     public Result test() {
         return ResultUtil.success(200,  "hello Dynamic！");
     }

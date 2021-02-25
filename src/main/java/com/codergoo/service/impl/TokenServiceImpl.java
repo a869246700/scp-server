@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * token 业务层实现类
@@ -31,7 +32,7 @@ import java.util.Map;
 public class TokenServiceImpl implements TokenService {
     
     @Value("${token.expire-time}")
-    public String tokenExpireTime;
+    public Integer tokenExpireTime;
     
     @Autowired
     public RedisUtil redisUtil;
@@ -59,10 +60,9 @@ public class TokenServiceImpl implements TokenService {
         }
         
         // 3. 获取服务器token是否过期时间
-        Integer tokenExpireTimeVal = Integer.valueOf(tokenExpireTime) * 60 * 60; // 进行转换 8 * 60 * 60
         Map<String, Object> map = new HashMap<>();
         Calendar instance = Calendar.getInstance();
-        instance.add(Calendar.SECOND, tokenExpireTimeVal);
+        instance.add(Calendar.HOUR, tokenExpireTime); // token8小时过期
     
         // 4. 生成最新token
         // JWT的header部分,该map可以是空的,因为有默认值{"alg":HS256,"typ":"JWT"}
@@ -75,7 +75,7 @@ public class TokenServiceImpl implements TokenService {
                 .sign(Algorithm.HMAC256(account.getPassword())); // 以 scp 作为 token 的密钥
         
         // 4. 将token保存到 redis 中
-        redisUtil.set(accountTokenStr + account.getId(), token, tokenExpireTimeVal);
+        redisUtil.setEx(accountTokenStr + account.getId(), token, tokenExpireTime, TimeUnit.HOURS);
         return token;
     }
     
@@ -111,7 +111,7 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public Boolean removeToken(Integer accountId) {
         try {
-            redisUtil.del(accountTokenStr + accountId);
+            redisUtil.delete(accountTokenStr + accountId);
             return true;
         } catch (Exception e) {
             return false;
@@ -139,9 +139,9 @@ public class TokenServiceImpl implements TokenService {
             if (!token.equals(redisToken)) {
                 throw new RuntimeException("token错误，请重新获取！");
             }
-            // log.info("userId: " + decodedJWT.getClaim("aid").asInt());
-            // log.info("username: " + decodedJWT.getClaim("username").asString());
-            // log.info("过期时间: " + decodedJWT.getExpiresAt());
+            log.info("userId: " + decodedJWT.getClaim("aid").asInt());
+            log.info("username: " + decodedJWT.getClaim("username").asString());
+            log.info("过期时间: " + decodedJWT.getExpiresAt());
         } catch (JWTVerificationException e) {
             throw new RuntimeException("401");
         }
