@@ -1,7 +1,9 @@
 package com.codergoo.service.impl;
 
 import com.codergoo.domain.Dynamic;
+import com.codergoo.domain.DynamicLikes;
 import com.codergoo.domain.DynamicResource;
+import com.codergoo.domain.User;
 import com.codergoo.mapper.DynamicMapper;
 import com.codergoo.mapper.DynamicResourceMapper;
 import com.codergoo.service.DynamicResourceService;
@@ -162,12 +164,16 @@ public class DynamicServiceImpl implements DynamicService {
             // 属性转换
             BeanUtils.copyProperties(dynamic, dynamicVo);
     
-            // 动态资源转换
+            // 动态资源
             List<String> dynamicResourceList = dynamic.getResourceList().stream().map(DynamicResource::getSrc).collect(Collectors.toList());
             dynamicVo.setResourceList(dynamicResourceList);
-            resultDynamicList.add(dynamicVo);
             // 动态评论
             dynamicVo.setDiscussesList(dynamic.getDiscussList());
+            // 动态点赞
+            List<User> dynamicLikesList = dynamic.getLikesList().stream().map(DynamicLikes::getUser).collect(Collectors.toList());
+            dynamicVo.setLikesList(dynamicLikesList);
+            
+            resultDynamicList.add(dynamicVo);
         });
         
         // 3. 返回动态动态列表
@@ -199,6 +205,10 @@ public class DynamicServiceImpl implements DynamicService {
         dynamicVo.setResourceList(dynamicResourceList);
         // 动态评论
         dynamicVo.setDiscussesList(dynamic.getDiscussList());
+        // 动态点赞
+        List<User> dynamicLikesList = dynamic.getLikesList().stream().map(DynamicLikes::getUser).collect(Collectors.toList());
+        dynamicVo.setLikesList(dynamicLikesList);
+        
         return dynamicVo;
     }
 }

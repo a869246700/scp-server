@@ -33,6 +33,6 @@ public class DynamicVo {
     private Date time; // 发布时间
     
     private List<String> resourceList; // 动态资源列表
-    // private List<User> dynamicLikesList; // 点赞人列表
+    private List<User> likesList; // 点赞人列表
     private List<DynamicDiscuss> discussesList; // 动态评论列表
 }

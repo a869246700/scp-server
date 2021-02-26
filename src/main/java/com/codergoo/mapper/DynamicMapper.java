@@ -53,7 +53,9 @@ public interface DynamicMapper {
             @Result(column = "id", property = "resourceList", javaType = List.class,
                     many = @Many(select = "com.codergoo.mapper.DynamicResourceMapper.listByDid")),
             @Result(column = "id", property = "discussList", javaType = List.class,
-                    many = @Many(select = "com.codergoo.mapper.DynamicDiscussMapper.listByDid"))
+                    many = @Many(select = "com.codergoo.mapper.DynamicDiscussMapper.listByDid")),
+            @Result(column = "id", property = "likesList", javaType = List.class,
+                    many = @Many(select = "com.codergoo.mapper.DynamicLikesMapper.listByDid"))
     })
     Dynamic findById(Integer id);
     
@@ -65,7 +67,9 @@ public interface DynamicMapper {
             @Result(column = "id", property = "resourceList", javaType = List.class,
                     many = @Many(select = "com.codergoo.mapper.DynamicResourceMapper.listByDid")),
             @Result(column = "id", property = "discussList", javaType = List.class,
-                    many = @Many(select = "com.codergoo.mapper.DynamicDiscussMapper.listByDid"))
+                    many = @Many(select = "com.codergoo.mapper.DynamicDiscussMapper.listByDid")),
+            @Result(column = "id", property = "likesList", javaType = List.class,
+                    many = @Many(select = "com.codergoo.mapper.DynamicLikesMapper.listByDid"))
     })
     List<Dynamic> listDynamicByUid(Integer uid);
     
