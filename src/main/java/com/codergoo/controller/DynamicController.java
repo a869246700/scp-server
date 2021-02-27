@@ -96,6 +96,12 @@ public class DynamicController {
         return ResultUtil.success(dynamicList);
     }
     
+    // 获取热榜消息
+    @GetMapping("/hot")
+    public Result hotList() {
+        return ResultUtil.success();
+    }
+    
     // 修改动态的权限
     @PostMapping("/updatePermissions")
     public Result updatePermissions(Integer id, Integer permissions, HttpServletRequest httpServletRequest) {

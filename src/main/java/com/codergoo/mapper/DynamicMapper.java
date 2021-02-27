@@ -73,6 +73,20 @@ public interface DynamicMapper {
     })
     List<Dynamic> listDynamicByUid(Integer uid);
     
+    // 返回动态列表
+    @Select("select * from scp_dynamic order by time desc")
+    @Results({
+            @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER, id = true),
+            @Result(column = "show_adddress", property = "showAddress", jdbcType = JdbcType.INTEGER),
+            @Result(column = "id", property = "resourceList", javaType = List.class,
+                    many = @Many(select = "com.codergoo.mapper.DynamicResourceMapper.listByDid")),
+            @Result(column = "id", property = "discussList", javaType = List.class,
+                    many = @Many(select = "com.codergoo.mapper.DynamicDiscussMapper.listByDid")),
+            @Result(column = "id", property = "likesList", javaType = List.class,
+                    many = @Many(select = "com.codergoo.mapper.DynamicLikesMapper.listByDid"))
+    })
+    List<Dynamic> listDynamic();
+    
     // 根据动态id和用户uid获取动态条数
     @Select("select count(*) from scp_dynamic where id = #{id} and uid = #{uid}")
     Integer hasDynamic(Integer uid, Integer id);
