@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
+@EnableScheduling // 用是发现注解@Scheduled的任务并后台执行
 @MapperScan(basePackages = "com.codergoo.mapper")
 public class ScpApplication {
 
