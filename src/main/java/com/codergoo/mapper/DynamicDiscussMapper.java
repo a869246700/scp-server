@@ -22,10 +22,10 @@ public interface DynamicDiscussMapper {
     // 添加评论
     @Insert({
             "insert into scp_dynamic_discuss(",
-            "uid, did, content, rid",
+            "uid, did, content, rid, time",
             ")",
             "values(",
-            "#{uid}, #{did}, #{content}, #{rid}",
+            "#{uid}, #{did}, #{content}, #{rid}, #{time}",
             ")"
     })
     Integer addDiscuss(DynamicDiscuss dynamicDiscuss);

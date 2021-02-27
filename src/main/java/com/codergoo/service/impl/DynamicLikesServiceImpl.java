@@ -3,9 +3,12 @@ package com.codergoo.service.impl;
 import com.codergoo.domain.DynamicLikes;
 import com.codergoo.mapper.DynamicLikesMapper;
 import com.codergoo.service.DynamicLikesService;
+import com.codergoo.service.DynamicService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 /**
  * @author coderGoo
@@ -17,6 +20,9 @@ public class DynamicLikesServiceImpl implements DynamicLikesService {
     
     @Autowired
     public DynamicLikesMapper dynamicLikesMapper;
+    
+    @Autowired
+    public DynamicService dynamicService;
     
     @Override
     public Boolean addLikes(Integer uid, Integer did) {
@@ -30,9 +36,17 @@ public class DynamicLikesServiceImpl implements DynamicLikesService {
         dynamicLikes = new DynamicLikes();
         dynamicLikes.setDid(did);
         dynamicLikes.setUid(uid);
-        Integer integer = dynamicLikesMapper.addLikes(dynamicLikes);
+        // 设置时间
+        dynamicLikes.setTime(new Date(System.currentTimeMillis()));
         
-        return integer == 1;
+        // 执行添加
+        Integer integer = dynamicLikesMapper.addLikes(dynamicLikes);
+        if (integer == 1) {
+            // 添加热度
+            dynamicService.addDynamicHot(dynamicLikes.getDid(), 10.0);
+            return true;
+        }
+        return false;
     }
     
     @Override

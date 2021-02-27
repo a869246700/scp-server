@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 动态点赞实体类
@@ -20,6 +21,7 @@ public class DynamicLikes implements Serializable {
     private Integer id; // 点赞id
     private Integer uid; // 点赞用户id
     private Integer did; // 动态id
+    private Date time; // 点赞时间
 
     private User user; // 点赞人信息
 }

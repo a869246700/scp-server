@@ -50,10 +50,10 @@ public interface DynamicLikesMapper {
     
     @Insert({
             "insert into scp_dynamic_likes(",
-            "uid, did",
+            "uid, did, time",
             ")",
             "values(",
-            "#{uid}, #{did}",
+            "#{uid}, #{did}, #{time}",
             ")"
     })
     Integer addLikes(DynamicLikes dynamicLikes);

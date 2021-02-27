@@ -3,9 +3,12 @@ package com.codergoo.service.impl;
 import com.codergoo.domain.DynamicDiscuss;
 import com.codergoo.mapper.DynamicDiscussMapper;
 import com.codergoo.service.DynamicDiscussService;
+import com.codergoo.service.DynamicService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 /**
  * @author coderGoo
@@ -18,10 +21,21 @@ public class DynamicDiscussServiceImpl implements DynamicDiscussService {
     @Autowired
     public DynamicDiscussMapper dynamicDiscussMapper;
     
+    @Autowired
+    public DynamicService dynamicService;
+    
     @Override
     public Boolean addDynamicDiscuss(DynamicDiscuss dynamicDiscuss) {
+        // 设置时间
+        dynamicDiscuss.setTime(new Date(System.currentTimeMillis()));
+        
         Integer integer = dynamicDiscussMapper.addDiscuss(dynamicDiscuss);
-        return integer == 1;
+        if (integer == 1) {
+            // 添加热度
+            dynamicService.addDynamicHot(dynamicDiscuss.getDid(), 10.0);
+            return true;
+        }
+        return false;
     }
     
     @Override

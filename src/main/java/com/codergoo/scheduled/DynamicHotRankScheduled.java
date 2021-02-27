@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 /**
  * 动态热榜模块的定时任务
  *
@@ -18,6 +20,11 @@ public class DynamicHotRankScheduled {
     
     @Autowired
     public DynamicService dynamicService;
+    
+    @Scheduled(cron = "0 */1 * * * ?")
+    public void test() {
+        log.info("测试任务执行，" + LocalDateTime.now());
+    }
     
     // 每天 0 点计算排行榜数据
     @Scheduled(cron = "0 0 0 */1 * ?")

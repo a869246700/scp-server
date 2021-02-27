@@ -50,8 +50,8 @@ public class DynamicDiscussController {
         dynamicDiscuss.setUid(user.getId());
         
         // 3. 添加动态评论
-        dynamicDiscussService.addDynamicDiscuss(dynamicDiscuss);
-        return ResultUtil.success();
+        Boolean addSuccess = dynamicDiscussService.addDynamicDiscuss(dynamicDiscuss);
+        return addSuccess ? ResultUtil.success(200, "评论成功！") : ResultUtil.error(200, "评论失败！");
     }
     
     // 删除评论
@@ -67,9 +67,6 @@ public class DynamicDiscussController {
         }
         
         Boolean removeSuccess = dynamicDiscussService.removeDynamicDiscuss(id, user.getId());
-        if (removeSuccess) {
-            return ResultUtil.success(200, "删除评论成功！");
-        }
-        return ResultUtil.error(200, "删除评论失败！");
+        return removeSuccess ? ResultUtil.success(200, "删除评论成功！") : ResultUtil.error(200, "删除评论失败！");
     }
 }
