@@ -41,7 +41,7 @@ public class DynamicLikesServiceImpl implements DynamicLikesService {
         
         // 执行添加
         Integer integer = dynamicLikesMapper.addLikes(dynamicLikes);
-        if (integer == 1) {
+        if (1 == integer) {
             // 添加热度
             dynamicService.addDynamicHot(dynamicLikes.getDid(), 10.0);
             return true;

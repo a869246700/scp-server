@@ -30,7 +30,7 @@ public class DynamicDiscussServiceImpl implements DynamicDiscussService {
         dynamicDiscuss.setTime(new Date(System.currentTimeMillis()));
         
         Integer integer = dynamicDiscussMapper.addDiscuss(dynamicDiscuss);
-        if (integer == 1) {
+        if (1 == integer) {
             // 添加热度
             dynamicService.addDynamicHot(dynamicDiscuss.getDid(), 10.0);
             return true;
