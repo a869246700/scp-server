@@ -11,7 +11,10 @@ import com.codergoo.service.MailService;
 import com.codergoo.service.TokenService;
 import com.codergoo.service.UserService;
 import com.codergoo.utils.RedisUtil;
+import com.codergoo.vo.LoginMailVcVo;
 import com.codergoo.vo.MailVo;
+import com.codergoo.vo.RegisterMailVo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @RequestMapping("/api/account")
 @CrossOrigin // 开启跨域支持
+@Slf4j
 public class AccountController {
     
     @Autowired
@@ -68,7 +72,10 @@ public class AccountController {
         // 2. 获取随机验证码
         String registerVc = RandomStringUtils.randomNumeric(6);
     
-        // 3. 设置邮件对象
+        // 3. 将登录验证码保存到 redis 中
+        redisUtil.setEx(registerVcTag + to, registerVc, vcExpireTime, TimeUnit.MINUTES);
+        
+        // 4. 设置邮件对象
         MailVo mailVo = new MailVo();
         mailVo.setTo(to);
         mailVo.setSubject("【SCP】：账号注册验证码");
@@ -76,8 +83,6 @@ public class AccountController {
         MailVo sendMail = mailService.sendMail(mailVo);
     
         if ("ok".equals(sendMail.getStatus())) {
-            // 3. 将登录验证码保存到 redis 中
-            redisUtil.setEx(registerVcTag + to, registerVc, vcExpireTime, TimeUnit.MINUTES);
             return ResultUtil.success(200, "验证码发送成功!");
         }
         return ResultUtil.success(200, "验证码发送失败!");
@@ -95,8 +100,11 @@ public class AccountController {
         // 用户存在之后的操作
         // 2. 取随机验证码
         String loginVc = RandomStringUtils.randomNumeric(6);
-
-        // 3. 设置邮件对象
+    
+        // 3. 将登录验证码保存到 redis 中
+        redisUtil.setEx(loginVcTag + to, loginVc, vcExpireTime, TimeUnit.MINUTES);
+        
+        // 4. 设置邮件对象
         MailVo mailVo = new MailVo();
         mailVo.setTo(to);
         mailVo.setSubject("【SCP】：账号登录验证码");
@@ -104,8 +112,6 @@ public class AccountController {
         MailVo sendMail = mailService.sendMail(mailVo);
         
         if ("ok".equals(sendMail.getStatus())) {
-            // 3. 将登录验证码保存到 redis 中
-            redisUtil.setEx(loginVcTag + to, loginVc, vcExpireTime, TimeUnit.MINUTES);
             return ResultUtil.success(200, "验证码发送成功!");
         }
         return ResultUtil.success(200, "验证码发送失败!");
@@ -113,7 +119,7 @@ public class AccountController {
     
     // 注册：正常用户名密码
     @PostMapping("/register")
-    public Result register(Account account) {
+    public Result register(@RequestBody Account account) {
         // 1. 保证健壮性，判断是否存在 username 和 password
         if (StringUtils.isBlank(account.getUsername())) {
             return ResultUtil.error(200, "请确保账号输入不为空！");
@@ -165,7 +171,7 @@ public class AccountController {
     
     // 登录：正常用户名密码
     @PostMapping("/login")
-    public Result login(Account account) {
+    public Result login(@RequestBody Account account) {
         // 1. 保证健壮性，判断是否存在 username 和 password
         if (StringUtils.isBlank(account.getUsername())) {
             return ResultUtil.error(200, "请确保用户名输入不为空！");
@@ -204,7 +210,10 @@ public class AccountController {
     
     // 注册：邮件验证码
     @PostMapping("/registerByMailVc")
-    public Result registerByMailVc(String username, String registerVc) {
+    public Result registerByMailVc(@RequestBody RegisterMailVo registerMailVo) {
+        String username = registerMailVo.getUsername();
+        String registerVc = registerMailVo.getRegisterVc();
+        
         // 1. 保证健壮性，判断是否存在 username 和 loginVc
         if (StringUtils.isBlank(username)) {
             return ResultUtil.error(200, "请确保用户名输入不为空！");
@@ -276,7 +285,11 @@ public class AccountController {
     
     // 登录：邮件验证码
     @PostMapping("/loginByMailVc")
-    public Result loginByMailVc(String username, String loginVc) {
+    public Result loginByMailVc(@RequestBody LoginMailVcVo loginMailVcVo) {
+        String username = loginMailVcVo.getUsername();
+        String loginVc = loginMailVcVo.getLoginVc();
+    
+        log.info("username:" + username + ", loginVc:" + loginVc);
         // 1. 保证健壮性，判断是否存在 username 和 loginVc
         if (StringUtils.isBlank(username)) {
             return ResultUtil.error(200, "请确保用户名输入不为空！");
@@ -342,10 +355,23 @@ public class AccountController {
     // 修改密码
     @PostMapping("/updatePassword")
     @AccountLoginToken // 需要通过token校验
-    public Result updatePassword(Integer id, String password) {
-        Boolean updateSuccess = accountService.updateAccountPassword(id, password);
+    public Result updatePassword(String password, HttpServletRequest httpServletRequest) {
+        log.info("password:" + password);
+        if (StringUtils.isBlank(password)) {
+            return ResultUtil.error(200, "请确保密码输入不为空！");
+        }
+        // 1. 根据 token 获取用户信息
+        String token = httpServletRequest.getHeader("token");// 从 http 请求头中取出 token
+        Account account = tokenService.getAccountByToken(token);
+        
+        Boolean updateSuccess = accountService.updateAccountPassword(account.getId(), password);
         if (updateSuccess) {
-            return ResultUtil.success(200, "密码修改成功！");
+            account.setPassword(password);
+            // 获取最新的token
+            token = tokenService.generateToken(account);
+            JSONObject result = new JSONObject();
+            result.put("token", token);
+            return ResultUtil.success(200, "密码修改成功, 获取最新token！", result);
         }
         return ResultUtil.error(500, "密码修改失败！");
     }

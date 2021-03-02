@@ -91,7 +91,7 @@ public class DynamicHotRankTest {
     @Test
     void testGetYesterdayHotRank() {
         List<DynamicVo> dynamicVoList = dynamicService.getYesterdayHotRank(10);
-        
+        log.info("dynamicVoList:" + dynamicVoList);
         log.info("yesterdayHotRankLength: " + dynamicVoList.size());
         dynamicVoList.forEach(DynamicVo -> log.info(DynamicVo.toString()));
     }

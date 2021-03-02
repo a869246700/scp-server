@@ -51,13 +51,13 @@ public class TokenServiceImpl implements TokenService {
         // 登录成功后：生成JWT，保存到redis
         
         // 1. 判断是否已经存在token了，以防重复获取。等到过期了再去获取，否则直接获取 redis 中的 token即可
-        Object tokenObj = redisUtil.get(accountTokenStr + account.getId());
+        // Object tokenObj = redisUtil.get(accountTokenStr + account.getId());
         String token;
-        // 2. 如果不为空，则直接返回token
-        if (tokenObj != null) {
-            token = String.valueOf(tokenObj);
-            return token;
-        }
+        // // 2. 如果不为空，则直接返回token
+        // if (tokenObj != null) {
+        //     token = String.valueOf(tokenObj);
+        //     return token;
+        // }
         
         // 3. 获取服务器token是否过期时间
         Map<String, Object> map = new HashMap<>();
@@ -68,8 +68,8 @@ public class TokenServiceImpl implements TokenService {
         // JWT的header部分,该map可以是空的,因为有默认值{"alg":HS256,"typ":"JWT"}
         token = JWT.create()
                 .withHeader(map)
-                .withClaim("aid",account.getId()) //添加payload
-                .withClaim("username",account.getUsername())
+                .withClaim("aid", account.getId()) //添加payload
+                .withClaim("username", account.getUsername())
                 .withExpiresAt(instance.getTime()) //设置过期时间
                 .withAudience(String.valueOf(account.getId())) // 将 user id 保存到 token 里面
                 .sign(Algorithm.HMAC256(account.getPassword())); // 以 scp 作为 token 的密钥
@@ -131,6 +131,7 @@ public class TokenServiceImpl implements TokenService {
             // 1. 获取JWT
             DecodedJWT decodedJWT = jwtVerifier.verify(token);
             Integer aid = decodedJWT.getClaim("aid").asInt(); // 获取账户id
+            log.info("aid:" + aid);
             if (aid == null) {
                 throw new RuntimeException("token已过期，请重新获取！");
             }

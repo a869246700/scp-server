@@ -2,10 +2,8 @@ package com.codergoo.service;
 
 import com.codergoo.domain.Dynamic;
 import com.codergoo.vo.DynamicVo;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Date;
 import java.util.List;
 
 /**

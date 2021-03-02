@@ -45,7 +45,7 @@ public class AccountServiceImpl implements AccountService {
         // 设置账号状态 0：未激活， 1：激活， 2：封号
         account.setStatus(1);
         Integer integer = accountMapper.addAccount(account);
-        return integer == 0;
+        return integer == 1;
     }
     
     @Override
