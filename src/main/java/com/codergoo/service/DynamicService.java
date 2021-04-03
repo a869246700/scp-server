@@ -14,6 +14,8 @@ import java.util.List;
  */
 public interface DynamicService {
     
+    List<Dynamic> selfAllDynamicList(Integer uid);
+    
     // 添加动态
     DynamicVo addDynamic(Dynamic dynamic, MultipartFile[] resourceList);
     
@@ -25,6 +27,9 @@ public interface DynamicService {
     
     // 获取自己的动态列表
     List<DynamicVo> selfDynamicList(Integer uid);
+    
+    // 获取喜爱的列表
+    List<DynamicVo> likeDynamicList(Integer uid);
     
     // 获取动态最大ID
     Integer getMaxId();

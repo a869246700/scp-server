@@ -11,8 +11,12 @@ import com.codergoo.domain.DynamicDiscuss;
 public interface DynamicDiscussService {
     
     // 添加动态评论
-    Boolean addDynamicDiscuss(DynamicDiscuss dynamicDiscuss);
+    DynamicDiscuss addDynamicDiscuss(DynamicDiscuss dynamicDiscuss);
     
     // 删除动态评论
     Boolean removeDynamicDiscuss(Integer id, Integer uid);
+    
+    // 获取最大id
+    Integer getMaxId();
+    
 }

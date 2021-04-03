@@ -34,6 +34,7 @@ public class DynamicVo {
     
     private Double hot; // 热度值
     
+    private User user; // 发布人
     private List<String> resourceList; // 动态资源列表
     private List<User> likesList; // 点赞人列表
     private List<DynamicDiscuss> discussesList; // 动态评论列表

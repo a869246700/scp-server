@@ -12,10 +12,7 @@ import com.codergoo.service.TokenService;
 import com.codergoo.vo.DynamicDiscussVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -39,10 +36,14 @@ public class DynamicDiscussController {
     // 添加评论
     @PostMapping("/addDynamicDiscuss")
     @AccountLoginToken
-    public Result addDynamicDiscuss(DynamicDiscussVo dynamicDiscussVo, HttpServletRequest httpServletRequest) {
+    public Result addDynamicDiscuss(@RequestBody DynamicDiscussVo dynamicDiscussVo, HttpServletRequest httpServletRequest) {
         // 1. 根据 token 获取用户信息
         String token = httpServletRequest.getHeader("token"); // 从 http 请求头中取出 token
         User user = tokenService.getUserByToken(token);
+        
+        if (null == dynamicDiscussVo.getDid()) {
+            return ResultUtil.error(200, "请携带动态id！");
+        }
         
         // 2. 数据获取
         DynamicDiscuss dynamicDiscuss = new DynamicDiscuss();
@@ -50,8 +51,9 @@ public class DynamicDiscussController {
         dynamicDiscuss.setUid(user.getId());
         
         // 3. 添加动态评论
-        Boolean addSuccess = dynamicDiscussService.addDynamicDiscuss(dynamicDiscuss);
-        return addSuccess ? ResultUtil.success(200, "评论成功！") : ResultUtil.error(200, "评论失败！");
+        DynamicDiscuss addSuccess = dynamicDiscussService.addDynamicDiscuss(dynamicDiscuss);
+        
+        return null != addSuccess ? ResultUtil.success(200, "评论成功！", addSuccess) : ResultUtil.error(200, "评论失败！");
     }
     
     // 删除评论

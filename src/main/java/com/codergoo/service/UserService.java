@@ -20,7 +20,7 @@ public interface UserService {
     Boolean updateUserInfo(User user);
     
     // 修改用户头像
-    Boolean updateUserAvatar(Integer id, MultipartFile avatar);
+    Boolean updateUserAvatar(User user, MultipartFile avatar);
     
     // 根据id获取用户
     User findUserById(Integer id);

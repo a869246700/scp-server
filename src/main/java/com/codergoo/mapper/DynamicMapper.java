@@ -2,6 +2,7 @@ package com.codergoo.mapper;
 
 import com.codergoo.domain.Dynamic;
 import com.codergoo.domain.DynamicResource;
+import com.codergoo.domain.User;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
 import org.springframework.stereotype.Repository;
@@ -50,6 +51,8 @@ public interface DynamicMapper {
     @Results({
             @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER, id = true),
             @Result(column = "show_adddress", property = "showAddress", jdbcType = JdbcType.INTEGER),
+            @Result(column = "uid", property = "user", javaType = User.class,
+                    one = @One(select = "com.codergoo.mapper.UserMapper.findById")),
             @Result(column = "id", property = "resourceList", javaType = List.class,
                     many = @Many(select = "com.codergoo.mapper.DynamicResourceMapper.listByDid")),
             @Result(column = "id", property = "discussList", javaType = List.class,
@@ -64,6 +67,8 @@ public interface DynamicMapper {
     @Results({
             @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER, id = true),
             @Result(column = "show_adddress", property = "showAddress", jdbcType = JdbcType.INTEGER),
+            @Result(column = "uid", property = "user", javaType = User.class,
+                    one = @One(select = "com.codergoo.mapper.UserMapper.findById")),
             @Result(column = "id", property = "resourceList", javaType = List.class,
                     many = @Many(select = "com.codergoo.mapper.DynamicResourceMapper.listByDid")),
             @Result(column = "id", property = "discussList", javaType = List.class,
@@ -78,6 +83,8 @@ public interface DynamicMapper {
     @Results({
             @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER, id = true),
             @Result(column = "show_adddress", property = "showAddress", jdbcType = JdbcType.INTEGER),
+            @Result(column = "uid", property = "user", javaType = User.class,
+                    one = @One(select = "com.codergoo.mapper.UserMapper.findById")),
             @Result(column = "id", property = "resourceList", javaType = List.class,
                     many = @Many(select = "com.codergoo.mapper.DynamicResourceMapper.listByDid")),
             @Result(column = "id", property = "discussList", javaType = List.class,

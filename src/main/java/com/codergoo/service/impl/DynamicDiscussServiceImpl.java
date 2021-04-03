@@ -25,17 +25,24 @@ public class DynamicDiscussServiceImpl implements DynamicDiscussService {
     public DynamicService dynamicService;
     
     @Override
-    public Boolean addDynamicDiscuss(DynamicDiscuss dynamicDiscuss) {
+    public DynamicDiscuss addDynamicDiscuss(DynamicDiscuss dynamicDiscuss) {
         // 设置时间
-        dynamicDiscuss.setTime(new Date(System.currentTimeMillis()));
+        if (null == dynamicDiscuss.getTime()) {
+            dynamicDiscuss.setTime(new Date(System.currentTimeMillis()));
+        }
+        
+        // 设置id
+        Integer id = getMaxId();
+        dynamicDiscuss.setId(id);
         
         Integer integer = dynamicDiscussMapper.addDiscuss(dynamicDiscuss);
         if (1 == integer) {
             // 添加热度
             dynamicService.addDynamicHot(dynamicDiscuss.getDid(), 10.0);
-            return true;
+            dynamicDiscuss = dynamicDiscussMapper.findById(id);
+            return dynamicDiscuss;
         }
-        return false;
+        return null;
     }
     
     @Override
@@ -52,5 +59,11 @@ public class DynamicDiscussServiceImpl implements DynamicDiscussService {
         
         Integer integer = dynamicDiscussMapper.removeDiscuss(id);
         return integer == 1;
+    }
+    
+    @Override
+    public Integer getMaxId() {
+        Integer id = dynamicDiscussMapper.getMaxId();
+        return  id == null ? 1 : id + 1;
     }
 }

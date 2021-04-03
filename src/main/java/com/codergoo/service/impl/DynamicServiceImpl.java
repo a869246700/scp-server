@@ -6,6 +6,7 @@ import com.codergoo.domain.DynamicResource;
 import com.codergoo.domain.User;
 import com.codergoo.mapper.DynamicMapper;
 import com.codergoo.mapper.DynamicResourceMapper;
+import com.codergoo.service.DynamicLikesService;
 import com.codergoo.service.DynamicResourceService;
 import com.codergoo.service.DynamicService;
 import com.codergoo.utils.RedisUtil;
@@ -50,6 +51,9 @@ public class DynamicServiceImpl implements DynamicService {
     
     @Autowired
     public DynamicResourceService dynamicResourceService;
+    
+    @Autowired
+    public DynamicLikesService dynamicLikesService;
     
     @Autowired
     public DynamicMapper dynamicMapper;
@@ -226,6 +230,21 @@ public class DynamicServiceImpl implements DynamicService {
     }
     
     @Override
+    public List<DynamicVo> likeDynamicList(Integer uid) {
+        // 1. 根据uid获取用户的点赞列表
+        List<DynamicLikes> dynamicLikes = dynamicLikesService.getDynamicLikeList(uid);
+        // 2. 遍历喜欢列表获取动态信息
+        List<DynamicVo> dynamicVoList = new LinkedList<>();
+        dynamicLikes.forEach(like -> dynamicVoList.add(this.getDynamicById(like.getDid())));
+        return dynamicVoList;
+    }
+    
+    @Override
+    public List<Dynamic> selfAllDynamicList(Integer uid) {
+        return dynamicMapper.listDynamicByUid(uid);
+    }
+    
+    @Override
     public Integer getMaxId() {
         Integer id = dynamicMapper.getMaxId();
         return id == null ? 1 : id + 1;
@@ -298,11 +317,6 @@ public class DynamicServiceImpl implements DynamicService {
         // 根据key获取数据
         List<String> rankList = redisUtil.zReverseRangeWithScores(key, 0, rankLength).stream().map(TypedTuple::getValue).collect(Collectors.toList());
         List<Double> scoreList = redisUtil.zReverseRangeWithScores(key, 0, rankLength).stream().map(TypedTuple::getScore).collect(Collectors.toList());
-        // for (String rank : rankList) {
-        //     Integer id = Integer.valueOf(rank); // 获取id
-        //     // 根据id获取Dynamic
-        //     dynamicVoList.add(this.getDynamicById(id));
-        // }
     
         for (int i = 0; i < rankList.size(); i++) {
             Integer id = Integer.valueOf(rankList.get(i)); // 获取id

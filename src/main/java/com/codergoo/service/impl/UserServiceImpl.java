@@ -70,27 +70,34 @@ public class UserServiceImpl implements UserService {
     }
     
     @Override
-    public Boolean updateUserAvatar(Integer id, MultipartFile avatar) {
-        // 1. 判断保存路径是否为空
-        File folder = new File(userAvatarUpload);
-        // 目录判断, 如果路径不存在重新生成
-        if (!folder.isDirectory()) {
-            log.info("不存在目标路径，生成文件夹：" + userAvatarUpload);
-            folder.mkdirs();
+    public Boolean updateUserAvatar(User user, MultipartFile avatar) {
+        String filePath; // 文件保存路径
+        // 如果不为空
+        if (!StringUtils.isBlank(user.getAvatar())) {
+            filePath = user.getAvatar();
+        } else {
+            // 1. 判断保存路径是否为空
+            File folder = new File(userAvatarUpload);
+            // 目录判断, 如果路径不存在重新生成
+            if (!folder.isDirectory()) {
+                log.info("不存在目标路径，生成文件夹：" + userAvatarUpload);
+                folder.mkdirs();
+            }
+    
+            // 2. 生成用户头像文件的名称
+            String oldFilePath = avatar.getOriginalFilename();
+            assert oldFilePath != null;
+            String suffix = oldFilePath.substring(oldFilePath.lastIndexOf("."));
+            String fileName = "avatar-" + user.getId() + suffix;
+            filePath = userAvatarUpload + "/" + fileName;
         }
-        
-        // 2. 生成用户头像文件的名称
-        String oldFilePath = avatar.getOriginalFilename();
-        String suffix = oldFilePath.substring(oldFilePath.lastIndexOf("."));
-        String fileName = "avatar-" + id + suffix;
-        String filePath = userAvatarUpload + "/" + fileName;
         log.info("filePath: " + filePath);
         try {
             // 3. 保存头像文件
             avatar.transferTo(new File(filePath));
             
             // 4. 将路径保存到用户的avatar字段中去
-            Integer integer = userMapper.updateUserAvatar(id, filePath);
+            Integer integer = userMapper.updateUserAvatar(user.getId(), filePath);
             if (integer == 0) {
                 throw new RuntimeException("修改失败，不存在该用户信息！");
             } else if (integer > 1) {

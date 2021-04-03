@@ -288,8 +288,7 @@ public class AccountController {
     public Result loginByMailVc(@RequestBody LoginMailVcVo loginMailVcVo) {
         String username = loginMailVcVo.getUsername();
         String loginVc = loginMailVcVo.getLoginVc();
-    
-        log.info("username:" + username + ", loginVc:" + loginVc);
+        
         // 1. 保证健壮性，判断是否存在 username 和 loginVc
         if (StringUtils.isBlank(username)) {
             return ResultUtil.error(200, "请确保用户名输入不为空！");

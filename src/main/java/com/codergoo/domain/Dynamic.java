@@ -31,7 +31,7 @@ public class Dynamic implements Serializable {
     private Integer showAddress; // 是否显示发表地址
     private Date time; // 发布时间
     
-    // private User user; // 发表的用户
+    private User user; // 发表的用户
     private List<DynamicDiscuss> discussList; // 动态评论
     private List<DynamicLikes> likesList; // 动态点赞
     private List<DynamicResource> resourceList; // 动态资源列表

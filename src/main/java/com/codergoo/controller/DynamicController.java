@@ -31,16 +31,10 @@ public class DynamicController {
     
     @Autowired
     public TokenService tokenService;
-
-    @GetMapping("/test")
-    @AccountLoginToken
-    public Result test() {
-        return ResultUtil.success(200,  "hello Dynamic！");
-    }
     
     @PostMapping("/release")
     @AccountLoginToken
-    public Result release(String content, Integer permissions, Integer type, Integer showAddress, String address, MultipartFile[] resourceList, HttpServletRequest httpServletRequest) {
+    public Result release(String content, Integer permissions, Integer type, Integer showAddress, String address, @RequestParam(name = "imageList", required = false) MultipartFile[] resourceList, HttpServletRequest httpServletRequest) {
         // 1. 根据 token 获取用户信息
         String token = httpServletRequest.getHeader("token"); // 从 http 请求头中取出 token
         User user = tokenService.getUserByToken(token);
@@ -84,9 +78,9 @@ public class DynamicController {
     }
     
     // 获取自己的动态列表
-    @GetMapping("/selfList")
+    @GetMapping("/getSelfList")
     @AccountLoginToken
-    public Result selfList(HttpServletRequest httpServletRequest) {
+    public Result getSelfList(HttpServletRequest httpServletRequest) {
         // 1. 根据 token 获取用户信息
         String token = httpServletRequest.getHeader("token"); // 从 http 请求头中取出 token
         User user = tokenService.getUserByToken(token);
@@ -96,10 +90,49 @@ public class DynamicController {
         return ResultUtil.success(dynamicList);
     }
     
-    // 获取热榜消息
-    @GetMapping("/hot")
-    public Result hotList() {
-        return ResultUtil.success();
+    // 获取喜爱的动态列表
+    @GetMapping("/getLikeList")
+    @AccountLoginToken
+    public Result getLikeList(HttpServletRequest httpServletRequest) {
+        // 1. 根据 token 获取用户信息
+        String token = httpServletRequest.getHeader("token"); // 从 http 请求头中取出 token
+        User user = tokenService.getUserByToken(token);
+        List<DynamicVo> dynamicList = dynamicService.likeDynamicList(user.getId());
+        return ResultUtil.success(dynamicList);
+    }
+    // 获取今日热榜
+    @GetMapping("/getTodayHotRank")
+    public Result getTodayHotRank() {
+        List<DynamicVo> todayHotRank = dynamicService.getTodayHotRank(10);
+        return ResultUtil.success(todayHotRank);
+    }
+    
+    // 获取昨日热榜
+    @GetMapping("/getYesterdayHotRank")
+    public Result getYesterdayHotRank() {
+        List<DynamicVo> todayHotRank = dynamicService.getYesterdayHotRank(10);
+        return ResultUtil.success(todayHotRank);
+    }
+    
+    // 获取前三天热榜
+    @GetMapping("/getLastThreeDayHotRank")
+    public Result getLastThreeDayHotRank() {
+        List<DynamicVo> todayHotRank = dynamicService.getLastThreeDayHotRank(10);
+        return ResultUtil.success(todayHotRank);
+    }
+    
+    // 获取前七天热榜
+    @GetMapping("/getLastWeekHotRank")
+    public Result getLastWeekHotRank() {
+        List<DynamicVo> todayHotRank = dynamicService.getLastWeekHotRank(10);
+        return ResultUtil.success(todayHotRank);
+    }
+    
+    // 获取前三十天热榜
+    @GetMapping("/getLastMonthHotRank")
+    public Result getLastMonthHotRank() {
+        List<DynamicVo> todayHotRank = dynamicService.getLastMonthDayHotRank(10);
+        return ResultUtil.success(todayHotRank);
     }
     
     // 修改动态的权限

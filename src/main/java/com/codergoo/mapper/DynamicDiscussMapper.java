@@ -22,25 +22,39 @@ public interface DynamicDiscussMapper {
     // 添加评论
     @Insert({
             "insert into scp_dynamic_discuss(",
-            "uid, did, content, rid, time",
+            "id, uid, did, content, rid, time",
             ")",
             "values(",
-            "#{uid}, #{did}, #{content}, #{rid}, #{time}",
+            "#{id}, #{uid}, #{did}, #{content}, #{rid}, #{time}",
             ")"
     })
     Integer addDiscuss(DynamicDiscuss dynamicDiscuss);
+    
+    @Select("select max(id) from scp_dynamic_discuss")
+    Integer getMaxId();
     
     // 删除评论
     @Delete("delete from scp_dynamic_discuss where id = #{id}")
     Integer removeDiscuss(Integer id);
     
     @Select("select * from scp_dynamic_discuss where id = #{id}")
+    @Results({
+            @Result(column = "id", property = "id", id = true, jdbcType = JdbcType.INTEGER),
+            @Result(column = "uid", property = "uid", jdbcType = JdbcType.INTEGER),
+            @Result(column = "rid", property = "rid", jdbcType = JdbcType.INTEGER),
+            @Result(column = "uid", property = "user", javaType = User.class,
+                    one = @One(select = "com.codergoo.mapper.UserMapper.findById")),
+            @Result(column = "rid", property = "rUser", javaType = User.class,
+                    one = @One(select = "com.codergoo.mapper.UserMapper.findById"))
+    })
     DynamicDiscuss findById(Integer id);
     
     // 根据动态did获取评论列表
     @Select("select * from scp_dynamic_discuss where did = #{did}")
     @Results({
             @Result(column = "id", property = "id", id = true, jdbcType = JdbcType.INTEGER),
+            @Result(column = "uid", property = "uid", jdbcType = JdbcType.INTEGER),
+            @Result(column = "rid", property = "rid", jdbcType = JdbcType.INTEGER),
             @Result(column = "uid", property = "user", javaType = User.class,
                     one = @One(select = "com.codergoo.mapper.UserMapper.findById")),
             @Result(column = "rid", property = "rUser", javaType = User.class,

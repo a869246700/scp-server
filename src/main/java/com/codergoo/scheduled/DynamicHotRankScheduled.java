@@ -1,5 +1,6 @@
 package com.codergoo.scheduled;
 
+import com.codergoo.service.DynamicHotRankService;
 import com.codergoo.service.DynamicService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class DynamicHotRankScheduled {
     @Autowired
     public DynamicService dynamicService;
     
+    @Autowired
+    public DynamicHotRankService dynamicHotRankService;
+    
     @Scheduled(cron = "0 */1 * * * ?")
     public void test() {
         log.info("测试任务执行，" + LocalDateTime.now());
@@ -35,5 +39,10 @@ public class DynamicHotRankScheduled {
         dynamicService.calcLastWeekHotRank();
         dynamicService.calcLastMonthHotRank();
         log.info("计算 前三天、前七天、前三十天 动态热榜任务完成！");
+        
+        // 随机生成今日热榜数据
+        log.info("开始随机生成今日热榜开始！");
+        dynamicHotRankService.generateTodayHotRank();
+        log.info("开始随机生成今日热榜完成！");
     }
 }

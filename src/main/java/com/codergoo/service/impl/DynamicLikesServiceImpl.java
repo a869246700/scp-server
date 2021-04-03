@@ -1,5 +1,6 @@
 package com.codergoo.service.impl;
 
+import com.codergoo.domain.Dynamic;
 import com.codergoo.domain.DynamicLikes;
 import com.codergoo.mapper.DynamicLikesMapper;
 import com.codergoo.service.DynamicLikesService;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author coderGoo
@@ -60,5 +62,23 @@ public class DynamicLikesServiceImpl implements DynamicLikesService {
     
         Integer integer = dynamicLikesMapper.removeLikes(dynamicLikes.getId());
         return integer == 1;
+    }
+    
+    @Override
+    public Integer getAllDynamicLikesCount(Integer uid) {
+        List<Dynamic> dynamicList = dynamicService.selfAllDynamicList(uid);
+        int count = 0;
+        for (Dynamic dynamic : dynamicList) {
+            System.out.println("1111:" + dynamic);
+            if (null != dynamic.getLikesList()) {
+                count += dynamic.getLikesList().size();
+            }
+        }
+        return count;
+    }
+    
+    @Override
+    public List<DynamicLikes> getDynamicLikeList(Integer uid) {
+        return dynamicLikesMapper.listByUid(uid);
     }
 }
