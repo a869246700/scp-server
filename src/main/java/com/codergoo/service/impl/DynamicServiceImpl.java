@@ -23,9 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -128,7 +126,13 @@ public class DynamicServiceImpl implements DynamicService {
         DynamicVo dynamicVo = new DynamicVo();
         dynamicVo.setResourceList(dynamicResourceList);
         BeanUtils.copyProperties(dynamic, dynamicVo); // 属性转换
-        // 7. 返回数据
+        
+        // 7. 添加热度值
+        Double hot = 10.0;
+        this.addDynamicHot(dynamic.getId(), hot);
+        dynamicVo.setHot(hot);
+        
+        // 8. 返回数据
         return dynamicVo;
     }
     
@@ -221,7 +225,8 @@ public class DynamicServiceImpl implements DynamicService {
             // 动态点赞
             List<User> dynamicLikesList = dynamic.getLikesList().stream().map(DynamicLikes::getUser).collect(Collectors.toList());
             dynamicVo.setLikesList(dynamicLikesList);
-            
+            // 热度值
+            dynamicVo.setHot(this.getHotById(dynamicVo.getId()));
             resultDynamicList.add(dynamicVo);
         });
         
@@ -272,8 +277,28 @@ public class DynamicServiceImpl implements DynamicService {
         // 动态点赞
         List<User> dynamicLikesList = dynamic.getLikesList().stream().map(DynamicLikes::getUser).collect(Collectors.toList());
         dynamicVo.setLikesList(dynamicLikesList);
+        // 动态热度
+        dynamicVo.setHot(this.getHotById(dynamicVo.getId()));
         
         return dynamicVo;
+    }
+    
+    @Override
+    public Double getHotById(Integer id) {
+        // 1. 获取今日热度值排行榜
+        Date today = new Date(System.currentTimeMillis());
+        String todayStr = dynamicHotRankKeySdf.format(today);
+        String key = HOT_RANK_PREFIX + todayStr;
+        Set<TypedTuple<String>> todayHotRank = redisUtil.zReverseRangeWithScores(key, 0, -1);
+        // 2. 根据id获取该动态的热度值
+        Optional<TypedTuple<String>> first = todayHotRank.stream().filter(item -> Objects.equals(item.getValue(), String.valueOf(id))).findFirst();
+        if (first.isPresent()) {
+            // 存在
+            TypedTuple<String> dynamicRank = first.get();
+            return dynamicRank.getScore();
+        } else {
+            return 0.0;
+        }
     }
     
     @Override
