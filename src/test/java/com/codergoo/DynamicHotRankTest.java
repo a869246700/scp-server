@@ -33,8 +33,13 @@ public class DynamicHotRankTest {
     @Autowired
     public RedisUtil redisUtil;
     
+    // @Test
+    void testGetHotByDid() {
+        dynamicService.getHotById(1);
+    }
+    
     // 测试生成动态热度，已有的动态为标准10条（数据库中获取）
-    @Test
+    // @Test
     void testGenerateTodayHotRank() {
         Date today = new Date(System.currentTimeMillis()); // 今天
         SimpleDateFormat keySdf = new SimpleDateFormat("yyyyMMdd");
@@ -56,7 +61,7 @@ public class DynamicHotRankTest {
     }
     
     // 模拟生成前30天的数据
-    @Test
+    // @Test
     void testGenerateLastMonthHotRank() {
         List<String> keyList = dynamicService.getLastHotRankKey(30);
         
@@ -79,7 +84,7 @@ public class DynamicHotRankTest {
     }
     
     // 测试获取今天热度排行前十
-    @Test
+    // @Test
     void testGetTodayHotRank() {
         List<DynamicVo> dynamicVoList = dynamicService.getTodayHotRank(10);
     
@@ -88,7 +93,7 @@ public class DynamicHotRankTest {
     }
     
     // 测试获取昨天热度排行前十
-    @Test
+    // @Test
     void testGetYesterdayHotRank() {
         List<DynamicVo> dynamicVoList = dynamicService.getYesterdayHotRank(10);
         log.info("dynamicVoList:" + dynamicVoList);
@@ -97,13 +102,13 @@ public class DynamicHotRankTest {
     }
     
     // 测试计算前三天热度排行
-    @Test
+    // @Test
     void testCalcLastThreeDayHotRank() {
         dynamicService.calcLastThreeDayHotRank();
     }
     
     // 测试获取前三天热度排行前十
-    @Test
+    // @Test
     void testGetLastThreeDayHotRank() {
         List<DynamicVo> dynamicVoList = dynamicService.getLastThreeDayHotRank(10);
         
@@ -112,13 +117,13 @@ public class DynamicHotRankTest {
     }
     
     // 测试计算前七天（week）热度排行
-    @Test
+    // @Test
     void testCalcLastWeekHotRank() {
         dynamicService.calcLastWeekHotRank();
     }
     
     // 测试获取前七天（week）热度排行前十
-    @Test
+    // @Test
     void testGetLastWeekHotRank() {
         List<DynamicVo> dynamicVoList = dynamicService.getLastWeekHotRank(10);
         
@@ -127,13 +132,13 @@ public class DynamicHotRankTest {
     }
     
     // 测试计算前三十天（month）热度排行
-    @Test
+    // @Test
     void testCalcLastMonthHotRank() {
         dynamicService.calcLastMonthHotRank();
     }
     
     // 测试获取前三十天（month）热度排行前十
-    @Test
+    // @Test
     void testGetLastMonthHotRank() {
         List<DynamicVo> dynamicVoList = dynamicService.getLastMonthDayHotRank(10);
         

@@ -40,6 +40,9 @@ public interface DynamicService {
     // 根据动态id获取动态
     DynamicVo getDynamicById(Integer id);
     
+    // 根据id获取热度
+    Double getHotById(Integer id);
+    
     // 计算近一个月排行
     Boolean calcLastMonthHotRank();
     
