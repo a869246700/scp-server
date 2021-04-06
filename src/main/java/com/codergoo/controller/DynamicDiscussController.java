@@ -10,6 +10,7 @@ import com.codergoo.service.DynamicDiscussService;
 import com.codergoo.service.DynamicResourceService;
 import com.codergoo.service.TokenService;
 import com.codergoo.vo.DynamicDiscussVo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author coderGoo
  * @date 2021/2/25
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/dynamicDiscuss")
 @CrossOrigin
@@ -49,6 +51,8 @@ public class DynamicDiscussController {
         DynamicDiscuss dynamicDiscuss = new DynamicDiscuss();
         BeanUtils.copyProperties(dynamicDiscussVo, dynamicDiscuss);
         dynamicDiscuss.setUid(user.getId());
+        
+        log.info("dynamicDiscuss:" + dynamicDiscuss);
         
         // 3. 添加动态评论
         DynamicDiscuss addSuccess = dynamicDiscussService.addDynamicDiscuss(dynamicDiscuss);

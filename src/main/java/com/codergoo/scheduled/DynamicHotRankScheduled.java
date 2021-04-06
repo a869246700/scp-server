@@ -25,9 +25,12 @@ public class DynamicHotRankScheduled {
     @Autowired
     public DynamicHotRankService dynamicHotRankService;
     
-    @Scheduled(cron = "0 */1 * * * ?")
+    @Scheduled(cron = "0 */10 * * * ?")
     public void test() {
-        log.info("测试任务执行，" + LocalDateTime.now());
+        // 随机生成今日热榜数据
+        log.info("开始随机生成今日热榜开始！");
+        dynamicHotRankService.generateTodayHotRank();
+        log.info("开始随机生成今日热榜完成！");
     }
     
     // 每天 0 点计算排行榜数据
@@ -39,10 +42,5 @@ public class DynamicHotRankScheduled {
         dynamicService.calcLastWeekHotRank();
         dynamicService.calcLastMonthHotRank();
         log.info("计算 前三天、前七天、前三十天 动态热榜任务完成！");
-        
-        // 随机生成今日热榜数据
-        log.info("开始随机生成今日热榜开始！");
-        dynamicHotRankService.generateTodayHotRank();
-        log.info("开始随机生成今日热榜完成！");
     }
 }

@@ -20,6 +20,6 @@ public class DynamicDiscussVo {
     
     private Integer did; // 动态id
     private String content; // 评论内容
-    private Integer rid; // 被评论人id
+    private Integer pid; // 评论的父id，可为空
     private Date time; // 评论时间
 }

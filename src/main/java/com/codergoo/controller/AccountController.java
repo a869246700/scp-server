@@ -299,7 +299,7 @@ public class AccountController {
         // 2. 判断用户是否存在
         Account accountForBase = accountService.findAccountByUsername(username);
         if (null == accountForBase) {
-            return ResultUtil.error(200, "获取验证码失败,用户不存在!");
+            return ResultUtil.error(200, "登录失败,用户不存在!");
         }
         // 3. 校验验证码是否有效
         // 3.1 获取验证码

@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 动态评论实体类
@@ -22,9 +23,9 @@ public class DynamicDiscuss implements Serializable {
     private Integer uid; // 评论人id
     private Integer did; // 动态id
     private String content; // 评论内容
-    private Integer rid; // 被评论人id
+    private Integer pid; // 父评论id
     private Date time; // 评论时间
 
     private User user; // 评论人信息
-    private User rUser; // 被评论人信息
+    private List<DynamicDiscuss> children;
 }
