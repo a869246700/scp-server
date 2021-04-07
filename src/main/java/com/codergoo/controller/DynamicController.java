@@ -72,8 +72,23 @@ public class DynamicController {
     
     // 根据id获取动态
     @GetMapping("/getDynamic")
-    public Result getDynamic(Integer id) {
+    public Result getDynamic(Integer id, HttpServletRequest httpServletRequest) {
         DynamicVo dynamicVo = dynamicService.getDynamicById(id);
+        
+        // 如果不是公开的，则需要校验用户
+        if (1 != dynamicVo.getPermissions()) {
+            // 根据 token 获取用户信息
+            String token = httpServletRequest.getHeader("token"); // 从 http 请求头中取出 token
+            // 如果没用携带token
+            if (null == token || "".equals(token)) {
+                throw new RuntimeException("获取失败，该动态设置了查看权限！");
+            }
+            // 携带token，则需要判断用户是否是有权限看的
+            User user = tokenService.getUserByToken(token);
+            if (null == user || !dynamicVo.getUid().equals(user.getId())) {
+                throw new RuntimeException("获取失败，该动态设置了查看权限！");
+            }
+        }
         return ResultUtil.success(dynamicVo);
     }
     
@@ -90,6 +105,17 @@ public class DynamicController {
         return ResultUtil.success(dynamicList);
     }
     
+    // 获取自己私密的动态列表
+    @GetMapping("/getPrivateList")
+    @AccountLoginToken
+    public Result getPrivateList(HttpServletRequest httpServletRequest) {
+        // 1. 根据 token 获取用户信息
+        String token = httpServletRequest.getHeader("token"); // 从 http 请求头中取出 token
+        User user = tokenService.getUserByToken(token);
+    
+        return ResultUtil.success(dynamicService.listPrivateDynamic(user.getId()));
+    }
+    
     // 获取喜爱的动态列表
     @GetMapping("/getLikeList")
     @AccountLoginToken
@@ -97,7 +123,7 @@ public class DynamicController {
         // 1. 根据 token 获取用户信息
         String token = httpServletRequest.getHeader("token"); // 从 http 请求头中取出 token
         User user = tokenService.getUserByToken(token);
-        List<DynamicVo> dynamicList = dynamicService.likeDynamicList(user.getId());
+        List<DynamicVo> dynamicList = dynamicService.listLikeDynamic(user.getId());
         return ResultUtil.success(dynamicList);
     }
 }

@@ -28,8 +28,11 @@ public interface DynamicService {
     // 获取自己的动态列表
     List<DynamicVo> selfDynamicList(Integer uid);
     
+    // 根据用户id获取私密动态列表
+    List<DynamicVo> listPrivateDynamic(Integer uid);
+    
     // 获取喜爱的列表
-    List<DynamicVo> likeDynamicList(Integer uid);
+    List<DynamicVo> listLikeDynamic(Integer uid);
     
     // 获取动态最大ID
     Integer getMaxId();

@@ -51,6 +51,7 @@ public interface DynamicMapper {
     @Results({
             @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER, id = true),
             @Result(column = "show_adddress", property = "showAddress", jdbcType = JdbcType.INTEGER),
+            @Result(column = "uid", property = "uid", jdbcType = JdbcType.INTEGER),
             @Result(column = "uid", property = "user", javaType = User.class,
                     one = @One(select = "com.codergoo.mapper.UserMapper.findById")),
             @Result(column = "id", property = "resourceList", javaType = List.class,
@@ -67,6 +68,7 @@ public interface DynamicMapper {
     @Results({
             @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER, id = true),
             @Result(column = "show_adddress", property = "showAddress", jdbcType = JdbcType.INTEGER),
+            @Result(column = "uid", property = "uid", jdbcType = JdbcType.INTEGER),
             @Result(column = "uid", property = "user", javaType = User.class,
                     one = @One(select = "com.codergoo.mapper.UserMapper.findById")),
             @Result(column = "id", property = "resourceList", javaType = List.class,
@@ -78,11 +80,28 @@ public interface DynamicMapper {
     })
     List<Dynamic> listDynamicByUid(Integer uid);
     
+    @Select("select * from scp_dynamic where uid = #{uid} and permissions = #{permissions} order by time desc")
+    @Results({
+            @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER, id = true),
+            @Result(column = "show_adddress", property = "showAddress", jdbcType = JdbcType.INTEGER),
+            @Result(column = "uid", property = "uid", jdbcType = JdbcType.INTEGER),
+            @Result(column = "uid", property = "user", javaType = User.class,
+                    one = @One(select = "com.codergoo.mapper.UserMapper.findById")),
+            @Result(column = "id", property = "resourceList", javaType = List.class,
+                    many = @Many(select = "com.codergoo.mapper.DynamicResourceMapper.listByDid")),
+            @Result(column = "id", property = "discussList", javaType = List.class,
+                    many = @Many(select = "com.codergoo.mapper.DynamicDiscussMapper.listByDid")),
+            @Result(column = "id", property = "likesList", javaType = List.class,
+                    many = @Many(select = "com.codergoo.mapper.DynamicLikesMapper.listByDid"))
+    })
+    List<Dynamic> listDynamicByUidAndPermissions(Integer uid, Integer permissions);
+    
     // 返回动态列表
     @Select("select * from scp_dynamic order by time desc")
     @Results({
             @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER, id = true),
             @Result(column = "show_adddress", property = "showAddress", jdbcType = JdbcType.INTEGER),
+            @Result(column = "uid", property = "uid", jdbcType = JdbcType.INTEGER),
             @Result(column = "uid", property = "user", javaType = User.class,
                     one = @One(select = "com.codergoo.mapper.UserMapper.findById")),
             @Result(column = "id", property = "resourceList", javaType = List.class,

@@ -25,7 +25,7 @@ public class DynamicHotRankScheduled {
     @Autowired
     public DynamicHotRankService dynamicHotRankService;
     
-    @Scheduled(cron = "0 */10 * * * ?")
+    @Scheduled(cron = "0 */30 * * * ?")
     public void test() {
         // 随机生成今日热榜数据
         log.info("开始随机生成今日热榜开始！");
