@@ -1,14 +1,12 @@
 package com.codergoo.service.impl;
 
-import com.codergoo.domain.Dynamic;
-import com.codergoo.domain.DynamicLikes;
-import com.codergoo.domain.DynamicResource;
-import com.codergoo.domain.User;
+import com.codergoo.domain.*;
 import com.codergoo.mapper.DynamicMapper;
 import com.codergoo.mapper.DynamicResourceMapper;
 import com.codergoo.service.DynamicLikesService;
 import com.codergoo.service.DynamicResourceService;
 import com.codergoo.service.DynamicService;
+import com.codergoo.service.FriendService;
 import com.codergoo.utils.RedisUtil;
 import com.codergoo.vo.DynamicVo;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +50,9 @@ public class DynamicServiceImpl implements DynamicService {
     
     @Autowired
     public DynamicLikesService dynamicLikesService;
+    
+    @Autowired
+    public FriendService friendService;
     
     @Autowired
     public DynamicMapper dynamicMapper;
@@ -181,14 +182,14 @@ public class DynamicServiceImpl implements DynamicService {
     public List<DynamicVo> listDynamic() {
         // 1. 获取动态列表
         List<Dynamic> dynamicList = dynamicMapper.listDynamic();
-    
+        
         // 2. 中间数据转换处理 PO => VO
         List<DynamicVo> resultDynamicList = new LinkedList<>();
         dynamicList.forEach(dynamic -> {
             DynamicVo dynamicVo = new DynamicVo();
             // 属性转换
             BeanUtils.copyProperties(dynamic, dynamicVo);
-        
+            
             // 动态资源
             List<String> dynamicResourceList = dynamic.getResourceList().stream().map(DynamicResource::getSrc).collect(Collectors.toList());
             dynamicVo.setResourceList(dynamicResourceList);
@@ -197,10 +198,10 @@ public class DynamicServiceImpl implements DynamicService {
             // 动态点赞
             List<User> dynamicLikesList = dynamic.getLikesList().stream().map(DynamicLikes::getUser).collect(Collectors.toList());
             dynamicVo.setLikesList(dynamicLikesList);
-        
+            
             resultDynamicList.add(dynamicVo);
         });
-    
+        
         // 3. 返回动态动态列表
         return resultDynamicList;
     }
@@ -216,7 +217,7 @@ public class DynamicServiceImpl implements DynamicService {
             DynamicVo dynamicVo = new DynamicVo();
             // 属性转换
             BeanUtils.copyProperties(dynamic, dynamicVo);
-    
+            
             // 动态资源
             List<String> dynamicResourceList = dynamic.getResourceList().stream().map(DynamicResource::getSrc).collect(Collectors.toList());
             dynamicVo.setResourceList(dynamicResourceList);
@@ -238,14 +239,14 @@ public class DynamicServiceImpl implements DynamicService {
     public List<DynamicVo> listPrivateDynamic(Integer uid) {
         // 1. 获取动态列表
         List<Dynamic> dynamicList = dynamicMapper.listDynamicByUidAndPermissions(uid, 0);
-    
+        
         // 2. 中间数据转换处理 PO => VO
         List<DynamicVo> resultDynamicList = new LinkedList<>();
         dynamicList.forEach(dynamic -> {
             DynamicVo dynamicVo = new DynamicVo();
             // 属性转换
             BeanUtils.copyProperties(dynamic, dynamicVo);
-    
+            
             // 动态资源
             List<String> dynamicResourceList = dynamic.getResourceList().stream().map(DynamicResource::getSrc).collect(Collectors.toList());
             dynamicVo.setResourceList(dynamicResourceList);
@@ -258,7 +259,7 @@ public class DynamicServiceImpl implements DynamicService {
             dynamicVo.setHot(this.getHotById(dynamicVo.getId()));
             resultDynamicList.add(dynamicVo);
         });
-    
+        
         // 3. 返回动态动态列表
         return resultDynamicList;
     }
@@ -271,6 +272,73 @@ public class DynamicServiceImpl implements DynamicService {
         List<DynamicVo> dynamicVoList = new LinkedList<>();
         dynamicLikes.forEach(like -> dynamicVoList.add(this.getDynamicById(like.getDid())));
         return dynamicVoList;
+    }
+    
+    @Override
+    public List<DynamicVo> listFriendDynamic(Integer uid) {
+        // 1. 获取好友的动态列表
+        List<Dynamic> dynamicList = dynamicMapper.listFriendDynamicByUid(uid);
+        
+        // 2. 数据转换
+        return this.listTransfer(dynamicList);
+    }
+    
+    @Override
+    public List<DynamicVo> listAttentionDynamic(Integer uid) {
+        // 1. 获取好友的动态列表
+        List<Dynamic> dynamicList = dynamicMapper.listAttentionDynamicByUid(uid);
+    
+        // 2. 数据转换
+        return this.listTransfer(dynamicList);
+    }
+    
+    @Override
+    public List<DynamicVo> listDynamicByAddress(String address) {
+        // 1. 根据地址获取动态列表
+        List<Dynamic> dynamicList = dynamicMapper.listDynamicByAddress(address);
+        return listTransfer(dynamicList);
+    }
+    
+    public DynamicVo transfer(Dynamic dynamic) {
+        DynamicVo dynamicVo = new DynamicVo();
+        // 属性转换
+        BeanUtils.copyProperties(dynamic, dynamicVo);
+        // 动态资源转换
+        List<String> dynamicResourceList = dynamic.getResourceList().stream().map(DynamicResource::getSrc).collect(Collectors.toList());
+        dynamicVo.setResourceList(dynamicResourceList);
+        // 动态评论
+        dynamicVo.setDiscussesList(dynamic.getDiscussList());
+        // 动态点赞
+        List<User> dynamicLikesList = dynamic.getLikesList().stream().map(DynamicLikes::getUser).collect(Collectors.toList());
+        dynamicVo.setLikesList(dynamicLikesList);
+        // 动态热度
+        dynamicVo.setHot(this.getHotById(dynamicVo.getId()));
+        
+        return dynamicVo;
+    }
+    
+    public List<DynamicVo> listTransfer(List<Dynamic> dynamicList) {
+        // 2. 中间数据转换处理 PO => VO
+        List<DynamicVo> resultDynamicList = new LinkedList<>();
+        dynamicList.forEach(dynamic -> {
+            DynamicVo dynamicVo = new DynamicVo();
+            // 属性转换
+            BeanUtils.copyProperties(dynamic, dynamicVo);
+        
+            // 动态资源
+            List<String> dynamicResourceList = dynamic.getResourceList().stream().map(DynamicResource::getSrc).collect(Collectors.toList());
+            dynamicVo.setResourceList(dynamicResourceList);
+            // 动态评论
+            dynamicVo.setDiscussesList(dynamic.getDiscussList());
+            // 动态点赞
+            List<User> dynamicLikesList = dynamic.getLikesList().stream().map(DynamicLikes::getUser).collect(Collectors.toList());
+            dynamicVo.setLikesList(dynamicLikesList);
+        
+            resultDynamicList.add(dynamicVo);
+        });
+    
+        // 3. 返回动态动态列表
+        return resultDynamicList;
     }
     
     @Override
@@ -345,7 +413,7 @@ public class DynamicServiceImpl implements DynamicService {
     public List<DynamicVo> getYesterdayHotRank(Integer rankLength) {
         Date yesterday = DateUtils.addDays(new Date(System.currentTimeMillis()), -1);
         String yesterdayStr = dynamicHotRankKeySdf.format(yesterday);
-    
+        
         return this.getHotRankByDateStr(yesterdayStr, rankLength);
     }
     
@@ -367,7 +435,7 @@ public class DynamicServiceImpl implements DynamicService {
         // 根据key获取数据
         List<String> rankList = redisUtil.zReverseRangeWithScores(key, 0, rankLength).stream().map(TypedTuple::getValue).collect(Collectors.toList());
         List<Double> scoreList = redisUtil.zReverseRangeWithScores(key, 0, rankLength).stream().map(TypedTuple::getScore).collect(Collectors.toList());
-    
+        
         for (int i = 0; i < rankList.size(); i++) {
             Integer id = Integer.valueOf(rankList.get(i)); // 获取id
             Double hot = scoreList.get(i); // 获取热度值

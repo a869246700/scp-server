@@ -126,4 +126,32 @@ public class DynamicController {
         List<DynamicVo> dynamicList = dynamicService.listLikeDynamic(user.getId());
         return ResultUtil.success(dynamicList);
     }
+    
+    // 获取好友的动态列表
+    @GetMapping("/getFriendDynamicList")
+    @AccountLoginToken
+    public Result getFriendDynamicList(HttpServletRequest httpServletRequest) {
+        // 1. 根据 token 获取用户信息
+        String token = httpServletRequest.getHeader("token"); // 从 http 请求头中取出 token
+        User user = tokenService.getUserByToken(token);
+        // 2. 获取好友动态列表
+        return ResultUtil.success(dynamicService.listFriendDynamic(user.getId()));
+    }
+    
+    // 根据地址获取动态列表
+    @GetMapping("/getDynamicListByAddress")
+    public Result getDynamicListByAddress(String address) {
+        return ResultUtil.success(dynamicService.listDynamicByAddress(address));
+    }
+    
+    // 获取关注的动态列表
+    @GetMapping("/getAttentionDynamicList")
+    @AccountLoginToken
+    public Result getAttentionDynamicList(HttpServletRequest httpServletRequest) {
+        // 1. 根据 token 获取用户信息
+        String token = httpServletRequest.getHeader("token"); // 从 http 请求头中取出 token
+        User user = tokenService.getUserByToken(token);
+        // 2. 获取关注动态列表
+        return ResultUtil.success(dynamicService.listAttentionDynamic(user.getId()));
+    }
 }

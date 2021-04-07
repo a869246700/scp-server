@@ -34,6 +34,15 @@ public interface DynamicService {
     // 获取喜爱的列表
     List<DynamicVo> listLikeDynamic(Integer uid);
     
+    // 获取好友的动态列表
+    List<DynamicVo> listFriendDynamic(Integer uid);
+    
+    // 获取关注的动态列表
+    List<DynamicVo> listAttentionDynamic(Integer uid);
+    
+    // 根据地址模糊查询动态列表
+    List<DynamicVo> listDynamicByAddress(String address);
+    
     // 获取动态最大ID
     Integer getMaxId();
     

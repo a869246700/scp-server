@@ -63,6 +63,23 @@ public interface DynamicMapper {
     })
     Dynamic findById(Integer id);
     
+    // 地址查询动态列表
+    @Select("select * from scp_dynamic where address like concat('%', #{address}, '%') order by time desc")
+    @Results({
+            @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER, id = true),
+            @Result(column = "show_adddress", property = "showAddress", jdbcType = JdbcType.INTEGER),
+            @Result(column = "uid", property = "uid", jdbcType = JdbcType.INTEGER),
+            @Result(column = "uid", property = "user", javaType = User.class,
+                    one = @One(select = "com.codergoo.mapper.UserMapper.findById")),
+            @Result(column = "id", property = "resourceList", javaType = List.class,
+                    many = @Many(select = "com.codergoo.mapper.DynamicResourceMapper.listByDid")),
+            @Result(column = "id", property = "discussList", javaType = List.class,
+                    many = @Many(select = "com.codergoo.mapper.DynamicDiscussMapper.listByDid")),
+            @Result(column = "id", property = "likesList", javaType = List.class,
+                    many = @Many(select = "com.codergoo.mapper.DynamicLikesMapper.listByDid"))
+    })
+    List<Dynamic> listDynamicByAddress(String address);
+    
     // 根据用户uid返回动态列表
     @Select("select * from scp_dynamic where uid = #{uid} order by time desc")
     @Results({
@@ -79,6 +96,45 @@ public interface DynamicMapper {
                     many = @Many(select = "com.codergoo.mapper.DynamicLikesMapper.listByDid"))
     })
     List<Dynamic> listDynamicByUid(Integer uid);
+    
+    // 返回用户uid的好友动态列表
+    @Select({
+            "select * from scp_dynamic",
+            "where",
+            "uid in (select a.fid from scp_friend a, scp_friend b where a.fid = b.uid and b.fid = a.uid and a.uid = #{uid})",
+            "order by time desc"
+    })
+    @Results({
+            @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER, id = true),
+            @Result(column = "show_adddress", property = "showAddress", jdbcType = JdbcType.INTEGER),
+            @Result(column = "uid", property = "uid", jdbcType = JdbcType.INTEGER),
+            @Result(column = "uid", property = "user", javaType = User.class,
+                    one = @One(select = "com.codergoo.mapper.UserMapper.findById")),
+            @Result(column = "id", property = "resourceList", javaType = List.class,
+                    many = @Many(select = "com.codergoo.mapper.DynamicResourceMapper.listByDid")),
+            @Result(column = "id", property = "discussList", javaType = List.class,
+                    many = @Many(select = "com.codergoo.mapper.DynamicDiscussMapper.listByDid")),
+            @Result(column = "id", property = "likesList", javaType = List.class,
+                    many = @Many(select = "com.codergoo.mapper.DynamicLikesMapper.listByDid"))
+    })
+    List<Dynamic> listFriendDynamicByUid(Integer uid);
+    
+    // 返回用户uid的关注动态列表
+    @Select("select * from scp_dynamic where uid in (select fid from scp_friend where uid = 1) order by time desc")
+    @Results({
+            @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER, id = true),
+            @Result(column = "show_adddress", property = "showAddress", jdbcType = JdbcType.INTEGER),
+            @Result(column = "uid", property = "uid", jdbcType = JdbcType.INTEGER),
+            @Result(column = "uid", property = "user", javaType = User.class,
+                    one = @One(select = "com.codergoo.mapper.UserMapper.findById")),
+            @Result(column = "id", property = "resourceList", javaType = List.class,
+                    many = @Many(select = "com.codergoo.mapper.DynamicResourceMapper.listByDid")),
+            @Result(column = "id", property = "discussList", javaType = List.class,
+                    many = @Many(select = "com.codergoo.mapper.DynamicDiscussMapper.listByDid")),
+            @Result(column = "id", property = "likesList", javaType = List.class,
+                    many = @Many(select = "com.codergoo.mapper.DynamicLikesMapper.listByDid"))
+    })
+    List<Dynamic> listAttentionDynamicByUid(Integer uid);
     
     @Select("select * from scp_dynamic where uid = #{uid} and permissions = #{permissions} order by time desc")
     @Results({
