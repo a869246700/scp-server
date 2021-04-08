@@ -46,7 +46,7 @@ public class DynamicController {
         dynamic.setContent(content);
         dynamic.setType(type == null ? 1 : type);
         dynamic.setTag(tag);
-        dynamic.setShowAddress(showAddress == null ? 0 : 1);
+        dynamic.setShowAddress(showAddress);
         dynamic.setPermissions(permissions);
         dynamic.setAddress(address);
 
