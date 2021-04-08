@@ -63,6 +63,23 @@ public interface DynamicMapper {
     })
     Dynamic findById(Integer id);
     
+    // 根据学校id获取动态列表
+    @Select("select * from scp_dynamic where uid in (select id from scp_user where school = #{school})")
+    @Results({
+            @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER, id = true),
+            @Result(column = "show_adddress", property = "showAddress", jdbcType = JdbcType.INTEGER),
+            @Result(column = "uid", property = "uid", jdbcType = JdbcType.INTEGER),
+            @Result(column = "uid", property = "user", javaType = User.class,
+                    one = @One(select = "com.codergoo.mapper.UserMapper.findById")),
+            @Result(column = "id", property = "resourceList", javaType = List.class,
+                    many = @Many(select = "com.codergoo.mapper.DynamicResourceMapper.listByDid")),
+            @Result(column = "id", property = "discussList", javaType = List.class,
+                    many = @Many(select = "com.codergoo.mapper.DynamicDiscussMapper.listByDid")),
+            @Result(column = "id", property = "likesList", javaType = List.class,
+                    many = @Many(select = "com.codergoo.mapper.DynamicLikesMapper.listByDid"))
+    })
+    List<Dynamic> listDynamicBySchool(Integer school);
+    
     // 地址查询动态列表
     @Select("select * from scp_dynamic where address like concat('%', #{address}, '%') and show_address = 1 order by time desc")
     @Results({

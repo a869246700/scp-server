@@ -22,6 +22,9 @@ public interface DynamicService {
     // 删除动态
     Boolean removeDynamic(Integer id, Integer uid);
     
+    // 根据学校id获取动态列表
+    List<DynamicVo> listDynamicBySchool(Integer school);
+    
     // 获取所有动态列表（用于测试）
     List<DynamicVo> listDynamic();
     

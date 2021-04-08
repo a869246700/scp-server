@@ -205,6 +205,14 @@ public class DynamicServiceImpl implements DynamicService {
     }
     
     @Override
+    public List<DynamicVo> listDynamicBySchool(Integer school) {
+        // 1. 获取学校的动态列表
+        List<Dynamic> dynamicList = dynamicMapper.listDynamicBySchool(school);
+        // 2. 数据转换
+        return this.listTransfer(dynamicList);
+    }
+    
+    @Override
     public List<DynamicVo> selfDynamicList(Integer uid) {
         // 1. 获取动态列表
         List<Dynamic> dynamicList = dynamicMapper.listDynamicByUidAndPermissions(uid, 1);

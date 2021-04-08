@@ -83,6 +83,12 @@ public class DynamicController {
         return success ? ResultUtil.success(200, "修改成功!") : ResultUtil.error(400, "修改失败!");
     }
     
+    // 根据学校id获取动态列表
+    @GetMapping("/getDynamicBySchool")
+    public Result getDynamicBySchoolId(Integer school) {
+        return ResultUtil.success(dynamicService.listDynamicBySchool(school));
+    }
+    
     // 根据id获取动态
     @GetMapping("/getDynamic")
     public Result getDynamic(Integer id, HttpServletRequest httpServletRequest) {
