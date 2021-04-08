@@ -34,16 +34,18 @@ public class DynamicController {
     
     @PostMapping("/release")
     @AccountLoginToken
-    public Result release(String content, Integer permissions, Integer type, Integer showAddress, String address, @RequestParam(name = "imageList", required = false) MultipartFile[] resourceList, HttpServletRequest httpServletRequest) {
+    public Result release(String content, Integer permissions, String tag, Integer type, Integer showAddress, String address, @RequestParam(name = "imageList", required = false) MultipartFile[] resourceList, HttpServletRequest httpServletRequest) {
         // 1. 根据 token 获取用户信息
         String token = httpServletRequest.getHeader("token"); // 从 http 请求头中取出 token
         User user = tokenService.getUserByToken(token);
         
         // 2. 初始化动态
+        // 2. 初始化动态
         Dynamic dynamic = new Dynamic();
         dynamic.setUid(user.getId());
         dynamic.setContent(content);
         dynamic.setType(type == null ? 1 : type);
+        dynamic.setTag(tag);
         dynamic.setShowAddress(showAddress == null ? 0 : 1);
         dynamic.setPermissions(permissions);
         dynamic.setAddress(address);

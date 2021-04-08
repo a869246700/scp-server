@@ -71,8 +71,6 @@ public class DynamicServiceImpl implements DynamicService {
         Integer id = this.getMaxId(); // 获取id
         // 2. 设置基础默认信息
         dynamic.setId(id); // 表单最大id
-        dynamic.setType(1); // 默认：1
-        dynamic.setTag(0); // 标签暂未决定：默认：0
         dynamic.setStatus(1); // 默认：1
         dynamic.setTime(new Date(System.currentTimeMillis())); // 当前时间
         
