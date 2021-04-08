@@ -63,17 +63,33 @@ public class DynamicController {
         
         // 2. 移除根据id动态
         Boolean removeSuccess = dynamicService.removeDynamic(id, user.getId());
-        
         if (removeSuccess) {
             return  ResultUtil.success(200, "删除动态成功！");
         }
         return ResultUtil.error(200, "删除动态失败！");
     }
     
+    @PostMapping("/updatePermissions")
+    @AccountLoginToken
+    public Result updatePermissions(Integer id, Integer permissions, HttpServletRequest httpServletRequest) {
+        // 1. 根据 token 获取用户信息
+        String token = httpServletRequest.getHeader("token"); // 从 http 请求头中取出 token
+        User user = tokenService.getUserByToken(token);
+        
+        // 2. 修改权限
+        Boolean success = dynamicService.updateDynamicPermissions(id, user.getId(), permissions);
+        return success ? ResultUtil.success(200, "修改成功!") : ResultUtil.error(400, "修改失败!");
+    }
+    
     // 根据id获取动态
     @GetMapping("/getDynamic")
     public Result getDynamic(Integer id, HttpServletRequest httpServletRequest) {
         DynamicVo dynamicVo = dynamicService.getDynamicById(id);
+        
+        // 如果为空，则返回空数据
+        if (null == dynamicVo) {
+            return ResultUtil.error(500, "查询不到该动态信息!");
+        }
         
         // 如果不是公开的，则需要校验用户
         if (1 != dynamicVo.getPermissions()) {

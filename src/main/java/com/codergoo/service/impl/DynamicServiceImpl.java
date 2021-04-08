@@ -356,7 +356,7 @@ public class DynamicServiceImpl implements DynamicService {
     public DynamicVo getDynamicById(Integer id) {
         Dynamic dynamic = dynamicMapper.findById(id);
         if (null == dynamic) {
-            throw new RuntimeException("获取失败，查询不到该动态信息！");
+            return null;
         }
         
         DynamicVo dynamicVo = new DynamicVo();
@@ -441,6 +441,11 @@ public class DynamicServiceImpl implements DynamicService {
             Double hot = scoreList.get(i); // 获取热度值
             
             DynamicVo dynamicVo = this.getDynamicById(id);
+            // 如果为空，跳过
+            if (null == dynamicVo) {
+                continue;
+            }
+            // 如果设置权限跳过
             if (1 != dynamicVo.getPermissions()) {
                 continue;
             }
