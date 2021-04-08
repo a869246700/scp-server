@@ -339,7 +339,8 @@ public class DynamicServiceImpl implements DynamicService {
             // 动态点赞
             List<User> dynamicLikesList = dynamic.getLikesList().stream().map(DynamicLikes::getUser).collect(Collectors.toList());
             dynamicVo.setLikesList(dynamicLikesList);
-        
+            // 热度值
+            dynamicVo.setHot(this.getHotById(dynamicVo.getId()));
             resultDynamicList.add(dynamicVo);
         });
     
