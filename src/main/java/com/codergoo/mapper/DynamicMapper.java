@@ -64,7 +64,7 @@ public interface DynamicMapper {
     Dynamic findById(Integer id);
     
     // 地址查询动态列表
-    @Select("select * from scp_dynamic where address like concat('%', #{address}, '%') order by time desc")
+    @Select("select * from scp_dynamic where address like concat('%', #{address}, '%') and show_address = 1 order by time desc")
     @Results({
             @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER, id = true),
             @Result(column = "show_adddress", property = "showAddress", jdbcType = JdbcType.INTEGER),
