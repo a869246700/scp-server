@@ -25,7 +25,7 @@ public class DynamicVo {
     private String content; // 内容
     private Integer type; // 类型
     private String camouflage; // 伪装
-    private Integer tag; // 标签
+    private String tag; // 标签
     private Integer permissions; // 权限
     private Integer status; // 状态
     private String address; // 发表地址
