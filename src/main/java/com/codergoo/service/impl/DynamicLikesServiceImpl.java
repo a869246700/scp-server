@@ -69,7 +69,6 @@ public class DynamicLikesServiceImpl implements DynamicLikesService {
         List<Dynamic> dynamicList = dynamicService.selfAllDynamicList(uid);
         int count = 0;
         for (Dynamic dynamic : dynamicList) {
-            System.out.println("1111:" + dynamic);
             if (null != dynamic.getLikesList()) {
                 count += dynamic.getLikesList().size();
             }

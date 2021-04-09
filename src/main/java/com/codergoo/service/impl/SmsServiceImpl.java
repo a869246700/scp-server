@@ -63,9 +63,7 @@ public class SmsServiceImpl implements SmsService {
     
         try {
             CommonResponse response = client.getCommonResponse(request);
-            System.out.println(response.getData());
-        } catch (ServerException e) {
-            e.printStackTrace();
+            log.info(response.getData());
         } catch (ClientException e) {
             e.printStackTrace();
         }

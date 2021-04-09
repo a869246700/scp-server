@@ -8,12 +8,16 @@ import com.codergoo.domain.User;
 import com.codergoo.service.DynamicService;
 import com.codergoo.service.TokenService;
 import com.codergoo.vo.DynamicVo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 动态模块接口
@@ -24,6 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/dynamic")
 @CrossOrigin
+@Slf4j
 public class DynamicController {
     
     @Autowired
@@ -34,12 +39,60 @@ public class DynamicController {
     
     @PostMapping("/release")
     @AccountLoginToken
-    public Result release(String content, Integer permissions, String tag, Integer type, Integer showAddress, String address, @RequestParam(name = "imageList", required = false) MultipartFile[] resourceList, HttpServletRequest httpServletRequest) {
+    public Result release(String content, Integer permissions, String tag, Integer type, Integer showAddress, String address, HttpServletRequest httpServletRequest,
+                          @RequestParam(name = "image0", required = false) MultipartFile image0,
+                          @RequestParam(name = "image1", required = false) MultipartFile image1,
+                          @RequestParam(name = "image2", required = false) MultipartFile image2,
+                          @RequestParam(name = "image3", required = false) MultipartFile image3,
+                          @RequestParam(name = "image4", required = false) MultipartFile image4,
+                          @RequestParam(name = "image5", required = false) MultipartFile image5,
+                          @RequestParam(name = "image6", required = false) MultipartFile image6,
+                          @RequestParam(name = "image7", required = false) MultipartFile image7,
+                          @RequestParam(name = "image8", required = false) MultipartFile image8
+    ) {
         // 1. 根据 token 获取用户信息
         String token = httpServletRequest.getHeader("token"); // 从 http 请求头中取出 token
         User user = tokenService.getUserByToken(token);
         
         // 2. 初始化动态
+        Dynamic dynamic = new Dynamic();
+        dynamic.setUid(user.getId());
+        dynamic.setContent(content);
+        dynamic.setType(type == null ? 1 : type);
+        dynamic.setTag(tag);
+        dynamic.setShowAddress(showAddress);
+        dynamic.setPermissions(permissions);
+        dynamic.setAddress(address);
+        
+        // 动态图片获取
+        List<MultipartFile> files = new ArrayList<>();
+        files.add(image0);
+        files.add(image1);
+        files.add(image2);
+        files.add(image3);
+        files.add(image4);
+        files.add(image5);
+        files.add(image6);
+        files.add(image7);
+        files.add(image8);
+        // 除去空数据
+    
+        // 用于数据传递
+        MultipartFile[] resourceList = files.stream().filter(Objects::nonNull).toArray(MultipartFile[]::new); // 最多9张
+        
+        // 3. 进行动态添加
+        DynamicVo dynamicVo = dynamicService.addDynamic(dynamic, resourceList);
+        
+        return ResultUtil.success(200, "添加动态成功！", dynamicVo);
+    }
+    
+    // @PostMapping("/release")
+    @AccountLoginToken
+    public Result release(String content, Integer permissions, String tag, Integer type, Integer showAddress, String address, @RequestParam(name = "imageList", required = false) MultipartFile[] resourceList, HttpServletRequest httpServletRequest) {
+        // 1. 根据 token 获取用户信息
+        String token = httpServletRequest.getHeader("token"); // 从 http 请求头中取出 token
+        User user = tokenService.getUserByToken(token);
+        
         // 2. 初始化动态
         Dynamic dynamic = new Dynamic();
         dynamic.setUid(user.getId());
