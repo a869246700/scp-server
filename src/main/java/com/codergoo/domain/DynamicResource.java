@@ -10,7 +10,7 @@ import java.io.Serializable;
  * 动态附件资源实体类
  *
  * @author coderGoo
- * @date 2021/2/18
+ * @date 2021/2/25
  */
 @Data
 @NoArgsConstructor

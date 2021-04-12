@@ -1,9 +1,11 @@
 package com.codergoo.service;
 
 import com.codergoo.domain.User;
+import com.codergoo.vo.UserVo;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * 用户信息 业务逻辑接口
@@ -20,8 +22,13 @@ public interface UserService {
     Boolean updateUserInfo(User user);
     
     // 修改用户头像
-    Boolean updateUserAvatar(Integer id, MultipartFile avatar);
+    Boolean updateUserAvatar(User user, MultipartFile avatar);
     
     // 根据id获取用户
     User findUserById(Integer id);
+    
+    // 返回用户信息
+    UserVo findById(Integer id);
+    
+    List<UserVo> listUserByNickname(String nickname);
 }

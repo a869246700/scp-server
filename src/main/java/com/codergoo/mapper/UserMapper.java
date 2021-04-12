@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * 用户信息 持久化层
  *
@@ -20,6 +22,10 @@ public interface UserMapper {
     // 根据id获取 user
     @Select("select * from scp_user where id = #{id}")
     User findById(Integer id);
+    
+    // 根据用户名模糊查询
+    @Select("select * from scp_user where nickname like concat('%', #{nickname}, '%')")
+    List<User> listUserByNickname(String nickname);
     
     // 添加用户信息
     @Insert({

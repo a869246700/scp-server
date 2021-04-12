@@ -45,24 +45,24 @@ public class AccountServiceImpl implements AccountService {
         // 设置账号状态 0：未激活， 1：激活， 2：封号
         account.setStatus(1);
         Integer integer = accountMapper.addAccount(account);
-        return integer != 0;
+        return integer == 1;
     }
     
     @Override
     public Boolean updateAccountType(Integer id, Integer type) {
         Integer integer = accountMapper.updateAccountType(id, type);
-        return integer != 0;
+        return integer == 1;
     }
     
     @Override
     public Boolean updateAccountStatus(Integer id, Integer status) {
         Integer integer = accountMapper.updateAccountStatus(id, status);
-        return integer != 0;
+        return integer == 1;
     }
     
     @Override
     public Boolean updateAccountPassword(Integer id, String password) {
         Integer integer = accountMapper.updateAccountPassword(id, password);
-        return integer != 0;
+        return integer == 1;
     }
 }

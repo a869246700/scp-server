@@ -2,9 +2,14 @@ package com.codergoo.service.impl;
 
 import com.codergoo.domain.User;
 import com.codergoo.mapper.UserMapper;
+import com.codergoo.service.DynamicLikesService;
+import com.codergoo.service.DynamicService;
+import com.codergoo.service.FriendService;
 import com.codergoo.service.UserService;
+import com.codergoo.vo.UserVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -12,6 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 用户信息 业务逻辑实现类
@@ -25,6 +32,12 @@ public class UserServiceImpl implements UserService {
     
     @Autowired
     public UserMapper userMapper;
+    
+    @Autowired
+    public DynamicLikesService dynamicLikesService;
+    
+    @Autowired
+    public FriendService friendService;
     
     @Value("${web.upload.user-avatar}")
     public String userAvatarUpload;
@@ -41,6 +54,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findUserById(Integer id) {
         return userMapper.findById(id);
+    }
+    
+    @Override
+    public UserVo findById(Integer id) {
+        UserVo userVo = new UserVo();
+        User user = userMapper.findById(id);
+        BeanUtils.copyProperties(user, userVo);
+        
+        // 获取获赞数、关注数、粉丝数
+        userVo.setLikes(dynamicLikesService.getAllDynamicLikesCount(user.getId()));
+        userVo.setFollows(friendService.getFollowsNumber(user.getId()));
+        userVo.setFans(friendService.getFansNumber(user.getId()));
+        return userVo;
     }
     
     @Override
@@ -70,27 +96,34 @@ public class UserServiceImpl implements UserService {
     }
     
     @Override
-    public Boolean updateUserAvatar(Integer id, MultipartFile avatar) {
-        // 1. 判断保存路径是否为空
-        File folder = new File(userAvatarUpload);
-        // 目录判断, 如果路径不存在重新生成
-        if (!folder.isDirectory()) {
-            log.info("不存在目标路径，生成文件夹：" + userAvatarUpload);
-            folder.mkdirs();
+    public Boolean updateUserAvatar(User user, MultipartFile avatar) {
+        String filePath; // 文件保存路径
+        // 如果不为空
+        if (!StringUtils.isBlank(user.getAvatar())) {
+            filePath = user.getAvatar();
+        } else {
+            // 1. 判断保存路径是否为空
+            File folder = new File(userAvatarUpload);
+            // 目录判断, 如果路径不存在重新生成
+            if (!folder.isDirectory()) {
+                log.info("不存在目标路径，生成文件夹：" + userAvatarUpload);
+                folder.mkdirs();
+            }
+    
+            // 2. 生成用户头像文件的名称
+            String oldFilePath = avatar.getOriginalFilename();
+            assert oldFilePath != null;
+            String suffix = oldFilePath.substring(oldFilePath.lastIndexOf("."));
+            String fileName = "avatar-" + user.getId() + suffix;
+            filePath = userAvatarUpload + "/" + fileName;
         }
-        
-        // 2. 生成用户头像文件的名称
-        String oldFilePath = avatar.getOriginalFilename();
-        String suffix = oldFilePath.substring(oldFilePath.lastIndexOf("."));
-        String fileName = "avatar-" + id + suffix;
-        String filePath = userAvatarUpload + "/" + fileName;
         log.info("filePath: " + filePath);
         try {
             // 3. 保存头像文件
             avatar.transferTo(new File(filePath));
             
             // 4. 将路径保存到用户的avatar字段中去
-            Integer integer = userMapper.updateUserAvatar(id, filePath);
+            Integer integer = userMapper.updateUserAvatar(user.getId(), filePath);
             if (integer == 0) {
                 throw new RuntimeException("修改失败，不存在该用户信息！");
             } else if (integer > 1) {
@@ -100,5 +133,25 @@ public class UserServiceImpl implements UserService {
         } catch (IOException e) {
             return false;
         }
+    }
+    
+    @Override
+    public List<UserVo> listUserByNickname(String nickname) {
+        return this.listTransfer(userMapper.listUserByNickname(nickname));
+    }
+    
+    public List<UserVo> listTransfer(List<User> userList) {
+        List<UserVo> userVoList = new LinkedList<>();
+        userList.forEach(user -> {
+            UserVo userVo = new UserVo();
+            // 数据转换
+            BeanUtils.copyProperties(user, userVo);
+            // 获取获赞数、关注数、粉丝数
+            userVo.setLikes(dynamicLikesService.getAllDynamicLikesCount(user.getId()));
+            userVo.setFollows(friendService.getFollowsNumber(user.getId()));
+            userVo.setFans(friendService.getFansNumber(user.getId()));
+            userVoList.add(userVo);
+        });
+        return userVoList;
     }
 }

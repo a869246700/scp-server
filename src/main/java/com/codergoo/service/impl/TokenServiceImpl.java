@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * token 业务层实现类
@@ -31,7 +32,7 @@ import java.util.Map;
 public class TokenServiceImpl implements TokenService {
     
     @Value("${token.expire-time}")
-    public String tokenExpireTime;
+    public Integer tokenExpireTime;
     
     @Autowired
     public RedisUtil redisUtil;
@@ -50,32 +51,31 @@ public class TokenServiceImpl implements TokenService {
         // 登录成功后：生成JWT，保存到redis
         
         // 1. 判断是否已经存在token了，以防重复获取。等到过期了再去获取，否则直接获取 redis 中的 token即可
-        Object tokenObj = redisUtil.get(accountTokenStr + account.getId());
+        // Object tokenObj = redisUtil.get(accountTokenStr + account.getId());
         String token;
-        // 2. 如果不为空，则直接返回token
-        if (tokenObj != null) {
-            token = String.valueOf(tokenObj);
-            return token;
-        }
+        // // 2. 如果不为空，则直接返回token
+        // if (tokenObj != null) {
+        //     token = String.valueOf(tokenObj);
+        //     return token;
+        // }
         
         // 3. 获取服务器token是否过期时间
-        Integer tokenExpireTimeVal = Integer.valueOf(tokenExpireTime) * 60 * 60; // 进行转换 8 * 60 * 60
         Map<String, Object> map = new HashMap<>();
         Calendar instance = Calendar.getInstance();
-        instance.add(Calendar.SECOND, tokenExpireTimeVal);
+        instance.add(Calendar.HOUR, tokenExpireTime); // token8小时过期
     
         // 4. 生成最新token
         // JWT的header部分,该map可以是空的,因为有默认值{"alg":HS256,"typ":"JWT"}
         token = JWT.create()
                 .withHeader(map)
-                .withClaim("aid",account.getId()) //添加payload
-                .withClaim("username",account.getUsername())
+                .withClaim("aid", account.getId()) //添加payload
+                .withClaim("username", account.getUsername())
                 .withExpiresAt(instance.getTime()) //设置过期时间
                 .withAudience(String.valueOf(account.getId())) // 将 user id 保存到 token 里面
                 .sign(Algorithm.HMAC256(account.getPassword())); // 以 scp 作为 token 的密钥
         
         // 4. 将token保存到 redis 中
-        redisUtil.set(accountTokenStr + account.getId(), token, tokenExpireTimeVal);
+        redisUtil.setEx(accountTokenStr + account.getId(), token, tokenExpireTime, TimeUnit.HOURS);
         return token;
     }
     
@@ -111,7 +111,7 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public Boolean removeToken(Integer accountId) {
         try {
-            redisUtil.del(accountTokenStr + accountId);
+            redisUtil.delete(accountTokenStr + accountId);
             return true;
         } catch (Exception e) {
             return false;
@@ -131,6 +131,7 @@ public class TokenServiceImpl implements TokenService {
             // 1. 获取JWT
             DecodedJWT decodedJWT = jwtVerifier.verify(token);
             Integer aid = decodedJWT.getClaim("aid").asInt(); // 获取账户id
+            log.info("aid:" + aid);
             if (aid == null) {
                 throw new RuntimeException("token已过期，请重新获取！");
             }
