@@ -14,6 +14,8 @@ import java.util.List;
  */
 public interface DynamicService {
     
+    List<DynamicVo> searchDynamicByKeyword(String key);
+    
     List<Dynamic> selfAllDynamicList(Integer uid);
     
     // 添加动态

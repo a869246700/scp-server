@@ -37,6 +37,11 @@ public class DynamicController {
     @Autowired
     public TokenService tokenService;
     
+    @GetMapping("searchByKeyword")
+    public Result searchByKeyword(String keyword) {
+        return ResultUtil.success(dynamicService.searchDynamicByKeyword(keyword));
+    }
+    
     @PostMapping("/release")
     @AccountLoginToken
     public Result release(String content, Integer permissions, String tag, Integer type, Integer showAddress, String address, HttpServletRequest httpServletRequest,

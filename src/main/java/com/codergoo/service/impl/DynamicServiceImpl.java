@@ -64,6 +64,12 @@ public class DynamicServiceImpl implements DynamicService {
     public RedisUtil redisUtil;
     
     @Override
+    public List<DynamicVo> searchDynamicByKeyword(String key) {
+        List<Dynamic> dynamicList = dynamicMapper.searchByKeyword(key);
+        return this.listTransfer(dynamicList);
+    }
+    
+    @Override
     public DynamicVo addDynamic(Dynamic dynamic, MultipartFile[] resourceList) {
         List<String> dynamicResourceList = new LinkedList<>(); // 保存的动态资源信息
         
@@ -244,7 +250,10 @@ public class DynamicServiceImpl implements DynamicService {
     @Override
     public List<DynamicVo> listPrivateDynamic(Integer uid) {
         // 1. 获取动态列表
-        List<Dynamic> dynamicList = dynamicMapper.listDynamicByUidAndPermissions(uid, 0);
+        List<Dynamic> dynamicList = dynamicMapper.listDynamicByUidAndPermissions(uid, 0); // 不公开
+        List<Dynamic> dynamicList2 = dynamicMapper.listDynamicByUidAndPermissions(uid, 2); // 好友可看
+        
+        dynamicList.addAll(dynamicList2);
         
         // 2. 中间数据转换处理 PO => VO
         List<DynamicVo> resultDynamicList = new LinkedList<>();
