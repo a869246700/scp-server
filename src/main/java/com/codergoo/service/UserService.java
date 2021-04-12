@@ -1,6 +1,7 @@
 package com.codergoo.service;
 
 import com.codergoo.domain.User;
+import com.codergoo.vo.UserVo;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -24,4 +25,7 @@ public interface UserService {
     
     // 根据id获取用户
     User findUserById(Integer id);
+    
+    // 返回用户信息
+    UserVo findById(Integer id);
 }

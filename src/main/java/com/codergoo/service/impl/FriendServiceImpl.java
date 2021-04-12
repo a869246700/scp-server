@@ -45,4 +45,14 @@ public class FriendServiceImpl implements FriendService {
     public Boolean cancelAttention(Integer fid, Integer uid) {
         return 1 == friendMapper.removeAttention(fid, uid);
     }
+    
+    @Override
+    public Integer getFollowsNumber(Integer uid) {
+        return friendMapper.getAttentionNumber(uid);
+    }
+    
+    @Override
+    public Integer getFansNumber(Integer uid) {
+        return friendMapper.getFansNumber(uid);
+    }
 }

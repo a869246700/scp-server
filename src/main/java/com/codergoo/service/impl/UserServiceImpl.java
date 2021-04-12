@@ -2,9 +2,14 @@ package com.codergoo.service.impl;
 
 import com.codergoo.domain.User;
 import com.codergoo.mapper.UserMapper;
+import com.codergoo.service.DynamicLikesService;
+import com.codergoo.service.DynamicService;
+import com.codergoo.service.FriendService;
 import com.codergoo.service.UserService;
+import com.codergoo.vo.UserVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,6 +31,12 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public UserMapper userMapper;
     
+    @Autowired
+    public DynamicLikesService dynamicLikesService;
+    
+    @Autowired
+    public FriendService friendService;
+    
     @Value("${web.upload.user-avatar}")
     public String userAvatarUpload;
     
@@ -41,6 +52,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findUserById(Integer id) {
         return userMapper.findById(id);
+    }
+    
+    @Override
+    public UserVo findById(Integer id) {
+        UserVo userVo = new UserVo();
+        User user = userMapper.findById(id);
+        BeanUtils.copyProperties(user, userVo);
+        
+        // 获取获赞数、关注数、粉丝数
+        userVo.setLikes(dynamicLikesService.getAllDynamicLikesCount(user.getId()));
+        userVo.setFollows(friendService.getFollowsNumber(user.getId()));
+        userVo.setFans(friendService.getFansNumber(user.getId()));
+        return userVo;
     }
     
     @Override

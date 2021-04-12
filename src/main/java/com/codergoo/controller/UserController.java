@@ -77,36 +77,16 @@ public class UserController {
     @GetMapping("/getUser")
     @AccountLoginToken
     public Result getUser(HttpServletRequest httpServletRequest) {
-        UserVo userVo = new UserVo();
-        
-        // 1. 根据 token 获取用户信息
-        String token = httpServletRequest.getHeader("token"); // 从 http 请求头中取出 token
-        User user = tokenService.getUserByToken(token);
-    
-        BeanUtils.copyProperties(user, userVo);
-    
-        // 2. 获取获赞数、关注数、粉丝数
-        Integer likesNumber = dynamicLikesService.getAllDynamicLikesCount(user.getId());
-        userVo.setLikes(likesNumber);
-        
-        return ResultUtil.success(userVo);
-    }
-    
-    // 获取用户其他信息：获赞数、关注数、粉丝数
-    @GetMapping("/getInfo")
-    @AccountLoginToken
-    public Result getInfo(HttpServletRequest httpServletRequest) {
         // 1. 根据 token 获取用户信息
         String token = httpServletRequest.getHeader("token"); // 从 http 请求头中取出 token
         User user = tokenService.getUserByToken(token);
         
-        // 2. 获取获赞数、关注数、粉丝数
-        Integer likesNumber = dynamicLikesService.getAllDynamicLikesCount(user.getId());
-    
-        JSONObject result = new JSONObject();
-        result.put("likesNumber", likesNumber);
-        
-        return ResultUtil.success(result);
+        return ResultUtil.success(userService.findById(user.getId()));
     }
     
+    // 模糊查询用户
+    @GetMapping("/search")
+    public Result search(String nickname) {
+        return ResultUtil.success(nickname);
+    }
 }

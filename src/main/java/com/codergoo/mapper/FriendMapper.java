@@ -36,6 +36,14 @@ public interface FriendMapper {
     })
     List<Friend> listAttention(Integer uid);
     
+    // 查询关注数量
+    @Select("select count(*) from scp_friend where uid = #{uid}")
+    Integer getAttentionNumber(Integer uid);
+    
+    // 查询粉丝数量
+    @Select("select count(*) from scp_friend where fid = #{uid}")
+    Integer getFansNumber(Integer uid);
+    
     // 添加关注
     @Insert({
             "insert into",

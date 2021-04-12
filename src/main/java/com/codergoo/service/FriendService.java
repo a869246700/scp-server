@@ -24,4 +24,10 @@ public interface FriendService {
     
     // 删除好友（移除关注）
     Boolean cancelAttention(Integer fid, Integer uid);
+    
+    // 获取关注数量
+    Integer getFollowsNumber(Integer uid);
+    
+    // 获取粉丝数量
+    Integer getFansNumber(Integer uid);
 }
