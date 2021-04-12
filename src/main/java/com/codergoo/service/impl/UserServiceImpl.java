@@ -17,6 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 用户信息 业务逻辑实现类
@@ -131,5 +133,25 @@ public class UserServiceImpl implements UserService {
         } catch (IOException e) {
             return false;
         }
+    }
+    
+    @Override
+    public List<UserVo> listUserByNickname(String nickname) {
+        return this.listTransfer(userMapper.listUserByNickname(nickname));
+    }
+    
+    public List<UserVo> listTransfer(List<User> userList) {
+        List<UserVo> userVoList = new LinkedList<>();
+        userList.forEach(user -> {
+            UserVo userVo = new UserVo();
+            // 数据转换
+            BeanUtils.copyProperties(user, userVo);
+            // 获取获赞数、关注数、粉丝数
+            userVo.setLikes(dynamicLikesService.getAllDynamicLikesCount(user.getId()));
+            userVo.setFollows(friendService.getFollowsNumber(user.getId()));
+            userVo.setFans(friendService.getFansNumber(user.getId()));
+            userVoList.add(userVo);
+        });
+        return userVoList;
     }
 }

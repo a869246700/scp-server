@@ -87,6 +87,6 @@ public class UserController {
     // 模糊查询用户
     @GetMapping("/search")
     public Result search(String nickname) {
-        return ResultUtil.success(nickname);
+        return ResultUtil.success(userService.listUserByNickname(nickname));
     }
 }

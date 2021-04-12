@@ -5,6 +5,7 @@ import com.codergoo.vo.UserVo;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * 用户信息 业务逻辑接口
@@ -28,4 +29,6 @@ public interface UserService {
     
     // 返回用户信息
     UserVo findById(Integer id);
+    
+    List<UserVo> listUserByNickname(String nickname);
 }
