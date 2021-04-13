@@ -3,9 +3,11 @@ package com.codergoo.service.impl;
 import com.codergoo.domain.Friend;
 import com.codergoo.mapper.FriendMapper;
 import com.codergoo.service.FriendService;
+import com.codergoo.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,6 +24,9 @@ public class FriendServiceImpl implements FriendService {
     @Autowired
     public FriendMapper friendMapper;
     
+    @Autowired
+    public MessageService messageService;
+    
     @Override
     public List<Friend> listFriend(Integer uid) {
         return friendMapper.listFriend(uid);
@@ -31,6 +36,7 @@ public class FriendServiceImpl implements FriendService {
         return friendMapper.listAttention(uid);
     }
     
+    @Transactional
     @Override
     public Boolean addAttention(Integer fid, Integer uid) {
         Friend friend = new Friend();
@@ -38,6 +44,8 @@ public class FriendServiceImpl implements FriendService {
         friend.setUid(uid);
         friend.setGid(uid); // 暂定gid = uid
         friend.setStatus(1); // 默认为1
+        
+        messageService.addAttentionMessage(uid, fid); // 添加关注通知
         return 1 == friendMapper.addAttention(friend);
     }
     

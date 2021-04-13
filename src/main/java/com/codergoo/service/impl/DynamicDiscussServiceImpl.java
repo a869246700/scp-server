@@ -4,9 +4,11 @@ import com.codergoo.domain.DynamicDiscuss;
 import com.codergoo.mapper.DynamicDiscussMapper;
 import com.codergoo.service.DynamicDiscussService;
 import com.codergoo.service.DynamicService;
+import com.codergoo.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
@@ -24,6 +26,10 @@ public class DynamicDiscussServiceImpl implements DynamicDiscussService {
     @Autowired
     public DynamicService dynamicService;
     
+    @Autowired
+    public MessageService messageService;
+    
+    @Transactional
     @Override
     public DynamicDiscuss addDynamicDiscuss(DynamicDiscuss dynamicDiscuss) {
         // 设置时间
@@ -40,6 +46,17 @@ public class DynamicDiscussServiceImpl implements DynamicDiscussService {
             // 添加热度
             dynamicService.addDynamicHot(dynamicDiscuss.getDid(), 10.0);
             dynamicDiscuss = dynamicDiscussMapper.findById(id);
+            // 添加邮件通知
+            // 如果是对评论进行回复，则需要通知之前的评论人
+            if (null != dynamicDiscuss.getPid()) {
+                // 获取之前评论人id
+                DynamicDiscuss preDiscuss = dynamicDiscussMapper.findById(dynamicDiscuss.getPid());
+                messageService.addDynamicDiscussMessage(dynamicDiscuss.getDid(), dynamicDiscuss.getUid(), preDiscuss.getUid());
+            }
+            // 获取动态发布人id
+            Integer uid = dynamicService.getUidByDid(dynamicDiscuss.getDid());
+            messageService.addDynamicDiscussMessage(dynamicDiscuss.getDid(), dynamicDiscuss.getUid(), uid);
+            
             return dynamicDiscuss;
         }
         return null;
@@ -66,4 +83,6 @@ public class DynamicDiscussServiceImpl implements DynamicDiscussService {
         Integer id = dynamicDiscussMapper.getMaxId();
         return  id == null ? 1 : id + 1;
     }
+    
+    
 }

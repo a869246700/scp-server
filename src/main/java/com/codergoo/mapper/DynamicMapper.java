@@ -41,6 +41,10 @@ public interface DynamicMapper {
     })
     Integer updateDynamicPermissions(Integer id, Integer permissions);
     
+    // 根据did获取用户id
+    @Select("select uid from scp_dynamic where id = #{did}")
+    Integer getUidByDid(Integer did);
+    
     // 获取最大的id
     @Select("select max(id) from scp_dynamic")
     Integer getMaxId();

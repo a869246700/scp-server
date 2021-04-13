@@ -28,5 +28,5 @@ public interface MessageService {
     Boolean addDynamicLikeMessage(Integer did, Integer from, Integer uid);
     
     // 添加用户关注通知
-    Boolean addDynamicLikeMessage(Integer from, Integer uid);
+    Boolean addAttentionMessage(Integer from, Integer uid);
 }

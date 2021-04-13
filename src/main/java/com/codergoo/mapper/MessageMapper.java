@@ -18,8 +18,8 @@ public interface MessageMapper {
     
     @Select("select * from scp_message where uid = #{uid}")
     @Results({
-            @Result(column = "from", property = "from", jdbcType = JdbcType.INTEGER),
-            @Result(column = "from", property = "fromUser", javaType = User.class,
+            @Result(column = "sid", property = "sid", jdbcType = JdbcType.INTEGER),
+            @Result(column = "sid", property = "fromUser", javaType = User.class,
                     one = @One(select = "com.codergoo.mapper.UserMapper.findById")),
     })
     List<Message> getMessageList(Integer uid);
@@ -29,9 +29,9 @@ public interface MessageMapper {
     
     @Insert({
             "insert into scp_message(",
-            "uid, content, from, did, type, time",
+            "uid, content, sid, did, type, time, status",
             ") values(",
-            "#{uid}, #{content}, #{from}, #{did}, #{type}, #{time}",
+            "#{uid}, #{content}, #{sid}, #{did}, #{type}, #{time}, #{status}",
             ")"
     })
     Integer insertMessage(Message message);
