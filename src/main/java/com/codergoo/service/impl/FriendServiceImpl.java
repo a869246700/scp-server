@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -44,6 +45,7 @@ public class FriendServiceImpl implements FriendService {
         friend.setUid(uid);
         friend.setGid(uid); // 暂定gid = uid
         friend.setStatus(1); // 默认为1
+        friend.setTime(new Date(System.currentTimeMillis()));
         
         messageService.addAttentionMessage(uid, fid); // 添加关注通知
         return 1 == friendMapper.addAttention(friend);
