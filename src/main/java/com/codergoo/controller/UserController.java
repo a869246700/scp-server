@@ -86,4 +86,10 @@ public class UserController {
     public Result search(String nickname) {
         return ResultUtil.success(userService.listUserByNickname(nickname));
     }
+    
+    // 根据ID查询用户
+    @GetMapping("/getUserById")
+    public Result getUserById(Integer id) {
+        return null == id ? ResultUtil.error(500, "请传入用户id！") : ResultUtil.success(userService.findById(id));
+    }
 }

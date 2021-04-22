@@ -27,9 +27,9 @@ public interface MailService {
     // 构建复杂的邮件信息
     void sendMimeMail(MailVo mailVo);
     
-    //保存邮件
+    // 保存邮件
     MailVo saveMail(MailVo mailVo);
     
-    //获取邮件发信人
+    // 获取邮件发信人
     String getMailSendFrom();
 }

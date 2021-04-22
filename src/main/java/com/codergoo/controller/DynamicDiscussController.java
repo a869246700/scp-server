@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletRequest;
  * @author coderGoo
  * @date 2021/2/25
  */
-@Slf4j
 @RestController
 @RequestMapping("/api/dynamicDiscuss")
 @CrossOrigin
@@ -44,7 +43,7 @@ public class DynamicDiscussController {
         User user = tokenService.getUserByToken(token);
         
         if (null == dynamicDiscussVo.getDid()) {
-            return ResultUtil.error(200, "请携带动态id！");
+            return ResultUtil.error(500, "请携带动态id！");
         }
         
         // 2. 数据获取
@@ -52,12 +51,10 @@ public class DynamicDiscussController {
         BeanUtils.copyProperties(dynamicDiscussVo, dynamicDiscuss);
         dynamicDiscuss.setUid(user.getId());
         
-        log.info("dynamicDiscuss:" + dynamicDiscuss);
-        
         // 3. 添加动态评论
         DynamicDiscuss addSuccess = dynamicDiscussService.addDynamicDiscuss(dynamicDiscuss);
         
-        return null != addSuccess ? ResultUtil.success(200, "评论成功！", addSuccess) : ResultUtil.error(200, "评论失败！");
+        return null != addSuccess ? ResultUtil.success(200, "评论成功！", addSuccess) : ResultUtil.error(500, "评论失败！");
     }
     
     // 删除评论

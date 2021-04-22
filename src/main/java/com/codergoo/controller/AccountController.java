@@ -34,7 +34,6 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @RequestMapping("/api/account")
 @CrossOrigin // 开启跨域支持
-@Slf4j
 public class AccountController {
     
     @Autowired
@@ -67,7 +66,7 @@ public class AccountController {
         // 1. 判断用户是否已经存在
         Boolean isExist = accountService.isExist(to);
         if (isExist) {
-            return ResultUtil.error(200, "邮箱：" + to + " 已被注册，请前往登录！");
+            return ResultUtil.error(500, "邮箱：" + to + " 已被注册，请前往登录！");
         }
         // 2. 获取随机验证码
         String registerVc = RandomStringUtils.randomNumeric(6);
@@ -85,17 +84,16 @@ public class AccountController {
         if ("ok".equals(sendMail.getStatus())) {
             return ResultUtil.success(200, "验证码发送成功!");
         }
-        return ResultUtil.success(200, "验证码发送失败!");
+        return ResultUtil.success(500, "验证码发送失败!");
     }
     
     // 获取登录邮件验证码
     @GetMapping("/getLoginVc")
     public Result getLoginVerificationCode(String to) {
-        // 1. 判断用户是否存在
         // 1. 判断用户是否已经存在
         Boolean isExist = accountService.isExist(to);
         if (!isExist) {
-            return ResultUtil.error(200, "账号：" + to + " 未注册，请前往注册！");
+            return ResultUtil.error(500, "账号：" + to + " 未注册，请前往注册！");
         }
         // 用户存在之后的操作
         // 2. 取随机验证码
@@ -114,7 +112,7 @@ public class AccountController {
         if ("ok".equals(sendMail.getStatus())) {
             return ResultUtil.success(200, "验证码发送成功!");
         }
-        return ResultUtil.success(200, "验证码发送失败!");
+        return ResultUtil.error(500, "验证码发送失败!");
     }
     
     // 注册：正常用户名密码
@@ -122,17 +120,17 @@ public class AccountController {
     public Result register(@RequestBody Account account) {
         // 1. 保证健壮性，判断是否存在 username 和 password
         if (StringUtils.isBlank(account.getUsername())) {
-            return ResultUtil.error(200, "请确保账号输入不为空！");
+            return ResultUtil.error(500, "请确保账号输入不为空！");
         }
         if (StringUtils.isBlank(account.getPassword())) {
-            return ResultUtil.error(200, "请确保密码输入不为空！");
+            return ResultUtil.error(500, "请确保密码输入不为空！");
         }
         
         // 2. 判断用户是否已经存在
         Boolean isExist = accountService.isExist(account.getUsername());
         // 已存在
         if (isExist) {
-            return ResultUtil.error(200, "已存在该账号!");
+            return ResultUtil.error(500, "已存在该账号!");
         }
         
         // 3. 获取最大id
@@ -174,20 +172,20 @@ public class AccountController {
     public Result login(@RequestBody Account account) {
         // 1. 保证健壮性，判断是否存在 username 和 password
         if (StringUtils.isBlank(account.getUsername())) {
-            return ResultUtil.error(200, "请确保用户名输入不为空！");
+            return ResultUtil.error(500, "请确保用户名输入不为空！");
         }
         if (StringUtils.isBlank(account.getPassword())) {
-            return ResultUtil.error(200, "请确保密码输入不为空！");
+            return ResultUtil.error(500, "请确保密码输入不为空！");
         }
     
         // 2. 判断用户是否存在
         Account accountForBase = accountService.findAccountByUsername(account.getUsername());
         if (null == accountForBase) {
-            return ResultUtil.error(200, "登录失败,用户不存在!");
+            return ResultUtil.error(500, "登录失败,用户不存在!");
         }
         // 3. 校验密码
         if (!accountForBase.getPassword().equals(account.getPassword())) {
-            return ResultUtil.error(200, "登录失败,密码错误!");
+            return ResultUtil.error(500, "登录失败,密码错误!");
         }
         // 4. 设置token
         String token = tokenService.generateToken(accountForBase);
@@ -216,16 +214,16 @@ public class AccountController {
         
         // 1. 保证健壮性，判断是否存在 username 和 loginVc
         if (StringUtils.isBlank(username)) {
-            return ResultUtil.error(200, "请确保用户名输入不为空！");
+            return ResultUtil.error(500, "请确保用户名输入不为空！");
         }
         if (StringUtils.isBlank(registerVc)) {
-            return ResultUtil.error(200, "请确保验证码输入不为空！");
+            return ResultUtil.error(500, "请确保验证码输入不为空！");
         }
         
         // 2. 判断用户是否已经存在
         Boolean isExist = accountService.isExist(username);
         if (isExist) {
-            return ResultUtil.error(200, "获取验证码失败，已存在该账号!");
+            return ResultUtil.error(500, "获取验证码失败，已存在该账号!");
         }
         
         // 3. 校验验证码是否有效
@@ -239,7 +237,7 @@ public class AccountController {
         String registerVcRedis = String.valueOf(registerVcRedisObject);
         // 3.3 进行验证码校验
         if (!registerVc.equals(registerVcRedis)) {
-            return ResultUtil.error(200, "账号注册验证码错误，请重新输入！");
+            return ResultUtil.error(500, "账号注册验证码错误，请重新输入！");
         }
 
         // 4. 通过校验后，后续生成Account
@@ -291,15 +289,15 @@ public class AccountController {
         
         // 1. 保证健壮性，判断是否存在 username 和 loginVc
         if (StringUtils.isBlank(username)) {
-            return ResultUtil.error(200, "请确保用户名输入不为空！");
+            return ResultUtil.error(500, "请确保用户名输入不为空！");
         }
         if (StringUtils.isBlank(loginVc)) {
-            return ResultUtil.error(200, "请确保验证码输入不为空！");
+            return ResultUtil.error(500, "请确保验证码输入不为空！");
         }
         // 2. 判断用户是否存在
         Account accountForBase = accountService.findAccountByUsername(username);
         if (null == accountForBase) {
-            return ResultUtil.error(200, "登录失败,用户不存在!");
+            return ResultUtil.error(500, "登录失败,用户不存在!");
         }
         // 3. 校验验证码是否有效
         // 3.1 获取验证码
@@ -307,13 +305,13 @@ public class AccountController {
         Object loginVcRedisObject = redisUtil.get(loginVcKey);
         // 3.2 判断验证码是否过期
         if (null == loginVcRedisObject) {
-            return ResultUtil.error(200, "账号登录验证码过期，请重新获取！");
+            return ResultUtil.error(500, "账号登录验证码过期，请重新获取！");
         }
         String loginVcRedis = String.valueOf(loginVcRedisObject);
         // 3.3 进行验证码校验
         if (!loginVc.equals(loginVcRedis)) {
             System.out.println("loginVcRedis: " + loginVcRedis);
-            return ResultUtil.error(200, "账号登录验证码错误，请重新输入！");
+            return ResultUtil.error(500, "账号登录验证码错误，请重新输入！");
         }
         // 4. 通过校验后，设置token
         String token = tokenService.generateToken(accountForBase);
@@ -348,14 +346,13 @@ public class AccountController {
         if (logoutStatus) {
             return ResultUtil.success(200, "退出成功！");
         }
-        return ResultUtil.error(200, "退出失败！");
+        return ResultUtil.error(500, "退出失败！");
     }
     
     // 修改密码
     @PostMapping("/updatePassword")
     @AccountLoginToken // 需要通过token校验
     public Result updatePassword(String password, HttpServletRequest httpServletRequest) {
-        log.info("password:" + password);
         if (StringUtils.isBlank(password)) {
             return ResultUtil.error(200, "请确保密码输入不为空！");
         }
