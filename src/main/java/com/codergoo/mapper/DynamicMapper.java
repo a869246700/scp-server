@@ -53,7 +53,7 @@ public interface DynamicMapper {
     @Select("select * from scp_dynamic where id = #{id}")
     @Results({
             @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER, id = true),
-            @Result(column = "show_adddress", property = "showAddress", jdbcType = JdbcType.INTEGER),
+            @Result(column = "show_address", property = "showAddress", jdbcType = JdbcType.INTEGER),
             @Result(column = "uid", property = "uid", jdbcType = JdbcType.INTEGER),
             @Result(column = "uid", property = "user", javaType = User.class,
                     one = @One(select = "com.codergoo.mapper.UserMapper.findById")),
@@ -70,7 +70,7 @@ public interface DynamicMapper {
     @Select("select * from scp_dynamic where content like concat('%', #{keyword}, '%') and permissions = 1 order by time desc")
     @Results({
             @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER, id = true),
-            @Result(column = "show_adddress", property = "showAddress", jdbcType = JdbcType.INTEGER),
+            @Result(column = "show_address", property = "showAddress", jdbcType = JdbcType.INTEGER),
             @Result(column = "uid", property = "uid", jdbcType = JdbcType.INTEGER),
             @Result(column = "uid", property = "user", javaType = User.class,
                     one = @One(select = "com.codergoo.mapper.UserMapper.findById")),
@@ -87,7 +87,7 @@ public interface DynamicMapper {
     @Select("select * from scp_dynamic where uid in (select id from scp_user where school = #{school}) and permissions = 1 order by time desc")
     @Results({
             @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER, id = true),
-            @Result(column = "show_adddress", property = "showAddress", jdbcType = JdbcType.INTEGER),
+            @Result(column = "show_address", property = "showAddress", jdbcType = JdbcType.INTEGER),
             @Result(column = "uid", property = "uid", jdbcType = JdbcType.INTEGER),
             @Result(column = "uid", property = "user", javaType = User.class,
                     one = @One(select = "com.codergoo.mapper.UserMapper.findById")),
@@ -104,7 +104,7 @@ public interface DynamicMapper {
     @Select("select * from scp_dynamic where address like concat('%', #{address}, '%') and show_address = 1 and permissions = 1 order by time desc")
     @Results({
             @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER, id = true),
-            @Result(column = "show_adddress", property = "showAddress", jdbcType = JdbcType.INTEGER),
+            @Result(column = "show_address", property = "showAddress", jdbcType = JdbcType.INTEGER),
             @Result(column = "uid", property = "uid", jdbcType = JdbcType.INTEGER),
             @Result(column = "uid", property = "user", javaType = User.class,
                     one = @One(select = "com.codergoo.mapper.UserMapper.findById")),
@@ -121,7 +121,7 @@ public interface DynamicMapper {
     @Select("select * from scp_dynamic where uid = #{uid} order by time desc")
     @Results({
             @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER, id = true),
-            @Result(column = "show_adddress", property = "showAddress", jdbcType = JdbcType.INTEGER),
+            @Result(column = "show_address", property = "showAddress", jdbcType = JdbcType.INTEGER),
             @Result(column = "uid", property = "uid", jdbcType = JdbcType.INTEGER),
             @Result(column = "uid", property = "user", javaType = User.class,
                     one = @One(select = "com.codergoo.mapper.UserMapper.findById")),
@@ -144,7 +144,7 @@ public interface DynamicMapper {
     })
     @Results({
             @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER, id = true),
-            @Result(column = "show_adddress", property = "showAddress", jdbcType = JdbcType.INTEGER),
+            @Result(column = "show_address", property = "showAddress", jdbcType = JdbcType.INTEGER),
             @Result(column = "uid", property = "uid", jdbcType = JdbcType.INTEGER),
             @Result(column = "uid", property = "user", javaType = User.class,
                     one = @One(select = "com.codergoo.mapper.UserMapper.findById")),
@@ -161,7 +161,7 @@ public interface DynamicMapper {
     @Select("select * from scp_dynamic where uid in (select fid from scp_friend where uid = 1) and permissions = 1 order by time desc")
     @Results({
             @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER, id = true),
-            @Result(column = "show_adddress", property = "showAddress", jdbcType = JdbcType.INTEGER),
+            @Result(column = "show_address", property = "showAddress", jdbcType = JdbcType.INTEGER),
             @Result(column = "uid", property = "uid", jdbcType = JdbcType.INTEGER),
             @Result(column = "uid", property = "user", javaType = User.class,
                     one = @One(select = "com.codergoo.mapper.UserMapper.findById")),
@@ -177,7 +177,7 @@ public interface DynamicMapper {
     @Select("select * from scp_dynamic where uid = #{uid} and permissions = #{permissions} order by time desc")
     @Results({
             @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER, id = true),
-            @Result(column = "show_adddress", property = "showAddress", jdbcType = JdbcType.INTEGER),
+            @Result(column = "show_address", property = "showAddress", jdbcType = JdbcType.INTEGER),
             @Result(column = "uid", property = "uid", jdbcType = JdbcType.INTEGER),
             @Result(column = "uid", property = "user", javaType = User.class,
                     one = @One(select = "com.codergoo.mapper.UserMapper.findById")),
@@ -194,7 +194,7 @@ public interface DynamicMapper {
     @Select("select * from scp_dynamic order by time desc")
     @Results({
             @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER, id = true),
-            @Result(column = "show_adddress", property = "showAddress", jdbcType = JdbcType.INTEGER),
+            @Result(column = "show_address", property = "showAddress", jdbcType = JdbcType.INTEGER),
             @Result(column = "uid", property = "uid", jdbcType = JdbcType.INTEGER),
             @Result(column = "uid", property = "user", javaType = User.class,
                     one = @One(select = "com.codergoo.mapper.UserMapper.findById")),
