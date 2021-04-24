@@ -48,9 +48,9 @@ public interface FriendMapper {
     @Insert({
             "insert into",
             "scp_friend(",
-            "fid, remark, status, uid, gid",
+            "fid, remark, status, uid, time",
             ") values(",
-            "#{fid}, #{remark}, #{status}, #{uid}, #{gid}",
+            "#{fid}, #{remark}, #{status}, #{uid}, #{time}",
             ")"
     })
     Integer addAttention(Friend friend);

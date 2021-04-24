@@ -43,7 +43,6 @@ public class FriendServiceImpl implements FriendService {
         Friend friend = new Friend();
         friend.setFid(fid);
         friend.setUid(uid);
-        friend.setGid(uid); // 暂定gid = uid
         friend.setStatus(1); // 默认为1
         friend.setTime(new Date(System.currentTimeMillis()));
         
