@@ -1,6 +1,5 @@
 package com.codergoo.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.codergoo.annotation.AccountLoginToken;
 import com.codergoo.common.entity.Result;
 import com.codergoo.common.utils.ResultUtil;
@@ -8,8 +7,6 @@ import com.codergoo.domain.User;
 import com.codergoo.service.DynamicLikesService;
 import com.codergoo.service.TokenService;
 import com.codergoo.service.UserService;
-import com.codergoo.vo.UserVo;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -88,5 +85,11 @@ public class UserController {
     @GetMapping("/search")
     public Result search(String nickname) {
         return ResultUtil.success(userService.listUserByNickname(nickname));
+    }
+    
+    // 根据ID查询用户
+    @GetMapping("/getUserById")
+    public Result getUserById(Integer id) {
+        return null == id ? ResultUtil.error(500, "请传入用户id！") : ResultUtil.success(userService.findById(id));
     }
 }

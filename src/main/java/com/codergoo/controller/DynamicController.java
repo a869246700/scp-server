@@ -91,29 +91,6 @@ public class DynamicController {
         return ResultUtil.success(200, "添加动态成功！", dynamicVo);
     }
     
-    // @PostMapping("/release")
-    @AccountLoginToken
-    public Result release(String content, Integer permissions, String tag, Integer type, Integer showAddress, String address, @RequestParam(name = "imageList", required = false) MultipartFile[] resourceList, HttpServletRequest httpServletRequest) {
-        // 1. 根据 token 获取用户信息
-        String token = httpServletRequest.getHeader("token"); // 从 http 请求头中取出 token
-        User user = tokenService.getUserByToken(token);
-        
-        // 2. 初始化动态
-        Dynamic dynamic = new Dynamic();
-        dynamic.setUid(user.getId());
-        dynamic.setContent(content);
-        dynamic.setType(type == null ? 1 : type);
-        dynamic.setTag(tag);
-        dynamic.setShowAddress(showAddress);
-        dynamic.setPermissions(permissions);
-        dynamic.setAddress(address);
-
-        // 3. 进行动态添加
-        DynamicVo dynamicVo = dynamicService.addDynamic(dynamic, resourceList);
-        
-        return ResultUtil.success(200, "添加动态成功！", dynamicVo);
-    }
-    
     @PostMapping("/delete")
     @AccountLoginToken
     public Result delete(Integer id, HttpServletRequest httpServletRequest) {
@@ -145,6 +122,12 @@ public class DynamicController {
     @GetMapping("/getDynamicBySchool")
     public Result getDynamicBySchoolId(Integer school) {
         return ResultUtil.success(dynamicService.listDynamicBySchool(school));
+    }
+    
+    // 根据用户id获取用户发布的动态列表
+    @GetMapping("/getDynamicListByUid")
+    public Result getDynamicListByUid(Integer uid) {
+        return null == uid ? ResultUtil.error(500, "获取用户动态列表需要列带用户id！") : ResultUtil.success(dynamicService.selfDynamicList(uid));
     }
     
     // 根据id获取动态

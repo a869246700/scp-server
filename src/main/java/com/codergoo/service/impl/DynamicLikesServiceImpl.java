@@ -5,9 +5,11 @@ import com.codergoo.domain.DynamicLikes;
 import com.codergoo.mapper.DynamicLikesMapper;
 import com.codergoo.service.DynamicLikesService;
 import com.codergoo.service.DynamicService;
+import com.codergoo.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -26,6 +28,10 @@ public class DynamicLikesServiceImpl implements DynamicLikesService {
     @Autowired
     public DynamicService dynamicService;
     
+    @Autowired
+    public MessageService messageService;
+    
+    @Transactional
     @Override
     public Boolean addLikes(Integer uid, Integer did) {
         // 1. 判断是否已经存在该点赞记录
@@ -46,6 +52,10 @@ public class DynamicLikesServiceImpl implements DynamicLikesService {
         if (1 == integer) {
             // 添加热度
             dynamicService.addDynamicHot(dynamicLikes.getDid(), 10.0);
+            
+            // 通知用户
+            Integer userId = dynamicService.getUidByDid(dynamicLikes.getDid());
+            messageService.addDynamicLikeMessage(dynamicLikes.getDid(), uid, userId);
             return true;
         }
         return false;

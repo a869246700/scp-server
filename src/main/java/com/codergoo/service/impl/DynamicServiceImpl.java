@@ -3,10 +3,7 @@ package com.codergoo.service.impl;
 import com.codergoo.domain.*;
 import com.codergoo.mapper.DynamicMapper;
 import com.codergoo.mapper.DynamicResourceMapper;
-import com.codergoo.service.DynamicLikesService;
-import com.codergoo.service.DynamicResourceService;
-import com.codergoo.service.DynamicService;
-import com.codergoo.service.FriendService;
+import com.codergoo.service.*;
 import com.codergoo.utils.RedisUtil;
 import com.codergoo.vo.DynamicVo;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -61,6 +59,9 @@ public class DynamicServiceImpl implements DynamicService {
     public DynamicResourceMapper dynamicResourceMapper;
     
     @Autowired
+    public MessageService messageService;
+    
+    @Autowired
     public RedisUtil redisUtil;
     
     @Override
@@ -69,6 +70,7 @@ public class DynamicServiceImpl implements DynamicService {
         return this.listTransfer(dynamicList);
     }
     
+    @Transactional
     @Override
     public DynamicVo addDynamic(Dynamic dynamic, MultipartFile[] resourceList) {
         List<String> dynamicResourceList = new LinkedList<>(); // 保存的动态资源信息
@@ -136,6 +138,9 @@ public class DynamicServiceImpl implements DynamicService {
         Double hot = 10.0;
         this.addDynamicHot(dynamic.getId(), hot);
         dynamicVo.setHot(hot);
+        
+        // 8. 通知
+        messageService.addDynamicReleaseMessage(id, dynamicVo.getUid());
         
         // 8. 返回数据
         return dynamicVo;
@@ -360,6 +365,11 @@ public class DynamicServiceImpl implements DynamicService {
     @Override
     public List<Dynamic> selfAllDynamicList(Integer uid) {
         return dynamicMapper.listDynamicByUid(uid);
+    }
+    
+    @Override
+    public Integer getUidByDid(Integer did) {
+        return dynamicMapper.getUidByDid(did);
     }
     
     @Override

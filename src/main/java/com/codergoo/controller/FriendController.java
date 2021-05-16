@@ -65,7 +65,7 @@ public class FriendController {
         User user = tokenService.getUserByToken(token);
         
         Boolean success = friendService.addAttention(fid, user.getId());
-        return success ? ResultUtil.success(200, "添加关注成功！") : ResultUtil.success(400, "添加关注失败！");
+        return success ? ResultUtil.success(200, "添加关注成功！") : ResultUtil.error(500, "添加关注失败！");
     }
     
     // 移除关注
@@ -77,6 +77,6 @@ public class FriendController {
         User user = tokenService.getUserByToken(token);
     
         Boolean success = friendService.cancelAttention(fid, user.getId());
-        return success ? ResultUtil.success(200, "取消关注成功！") : ResultUtil.success(400, "取消关注失败！");
+        return success ? ResultUtil.success(200, "取消关注成功！") : ResultUtil.error(500, "取消关注失败！");
     }
 }

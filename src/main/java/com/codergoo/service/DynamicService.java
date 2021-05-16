@@ -18,6 +18,9 @@ public interface DynamicService {
     
     List<Dynamic> selfAllDynamicList(Integer uid);
     
+    // 根据动态id获取用户id
+    Integer getUidByDid(Integer did);
+    
     // 添加动态
     DynamicVo addDynamic(Dynamic dynamic, MultipartFile[] resourceList);
     
