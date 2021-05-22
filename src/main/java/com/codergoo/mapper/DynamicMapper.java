@@ -158,7 +158,7 @@ public interface DynamicMapper {
     List<Dynamic> listFriendDynamicByUid(Integer uid);
     
     // 返回用户uid的关注动态列表
-    @Select("select * from scp_dynamic where uid in (select fid from scp_friend where uid = 1) and permissions = 1 order by time desc")
+    @Select("select * from scp_dynamic where uid in (select fid from scp_friend where uid = #{uid}) and permissions = 1 order by time desc")
     @Results({
             @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER, id = true),
             @Result(column = "show_address", property = "showAddress", jdbcType = JdbcType.INTEGER),
