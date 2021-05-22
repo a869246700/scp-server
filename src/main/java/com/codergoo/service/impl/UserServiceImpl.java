@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
         user.setSignature(user.getSignature() == null ? oldUser.getSignature() : user.getSignature());
         user.setFullname(user.getFullname() == null ? oldUser.getFullname() : user.getFullname());
         user.setBirthday(user.getBirthday() == null ? oldUser.getBirthday() : user.getBirthday());
-        user.setAvatar(user.getAvatar() == null ? oldUser.getAvatar() : user.getAvatar());
+        user.setAvatar(oldUser.getAvatar());
         
         // 判断修改次数
         Integer integer = userMapper.updateUser(user);
